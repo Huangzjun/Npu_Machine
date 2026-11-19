@@ -1,0 +1,16 @@
+[Unit]
+Description=Publish shared NPU machine metrics
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/npu-board/collect.py
+EnvironmentFile=/etc/npu-board/collector.env
+TimeoutStartSec=26s
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+Nice=10

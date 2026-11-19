@@ -1,0 +1,21 @@
+[Unit]
+Description=Relay signed NPU monitoring snapshots
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=/etc/npu-board/relay.env
+ExecStart=/usr/bin/python3 /opt/npu-board/relay.py
+Restart=on-failure
+RestartSec=3s
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+MemoryMax=128M
+TasksMax=40
+
+[Install]
+WantedBy=multi-user.target

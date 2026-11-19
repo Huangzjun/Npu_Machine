@@ -6,142 +6,239 @@
   <meta name="robots" content="noindex, nofollow">
   <title>NPU 资源看板</title>
   <meta name="board-api-origin" content="https://shared-npu-board-4.aptraisin1.chatgpt.site">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-qfConQEsf2kazJP+FcWurMto2CeTq5ta+6X+BxOVoUw='; script-src 'sha256-+MCfZN3kcghZoS1SRfivPcOyFxN/8Jt40KiSwosROZI='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
-  <style>:root{color-scheme:light;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.5;color:#13213a;background:#f4f6fa;--surface:#fff;--ink:#13213a;--muted:#53637c;--soft:#edf1f7;--rule:#dae3f0;--blue:#294ac8;--purple:#6847b8;--green:#087653;--orange:#ab5220;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;--shadow:0 4px 14px #21355708}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-qFSt0kqbWDcmR2pHqbM32WyP2w/P+iCBSah0QmunUA8='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
+  <style>:root{color-scheme:light;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;line-height:1.5;color:#17231c;background:#f5f6f4;--surface:#fff;--ink:#17231c;--muted:#68736c;--faint:#98a29b;--rule:#e3e8e4;--soft:#f3f5f3;--green:#2f7a4d;--green-soft:#e9f3ec;--green-line:#cfe3d5;--primary:#5c9d74;--amber:#93600f;--amber-soft:#fcf1dc;--red:#bf4547;--red-soft:#fcecec;--blue:#3a64a8;--blue-soft:#e8eef8;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;--radius:18px;--shadow:0 1px 3px #1a2a200a}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;min-width:320px}
-h1,h2,h3,p{margin:0}
-a{color:inherit}
-.topbar{background:#101c35;color:#edf2ff}
-.top-inner{min-height:62px;max-width:1560px;margin:auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand,.top-actions{display:flex;align-items:center;gap:11px}
-.brand{text-decoration:none;font-weight:720;font-size:.94rem;white-space:nowrap}
-.brand-icon{width:31px;height:31px;padding:7px;display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:8px;background:#6481f2}
-.brand-icon i{background:#fff;border-radius:1.5px}
-.brand-icon i:nth-child(2),.brand-icon i:nth-child(3){opacity:.55}
-.refresh-state{color:#c6d2ee;font-size:.81rem;text-align:right}
-main{max-width:1560px;margin:auto;padding:37px 32px 66px}
-.hero{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}
-h1{font-size:clamp(1.94rem,4vw,3rem);font-weight:780;letter-spacing:-.055em;line-height:1.15}
-.hero p{color:var(--muted);margin-top:7px;font-size:.95rem}
-button{cursor:pointer;border:1px solid transparent;border-radius:9px;background:var(--blue);color:#fff;padding:9px 15px;font:inherit;font-size:.9rem;font-weight:700;white-space:nowrap;transition:background .15s,border-color .15s}
-button:hover{background:#1f3ba9}
-button:disabled{opacity:.5;cursor:default}
-.secondary{color:#263e88;background:#f1f4fe;border-color:#dce5fd;padding:6px 10px;font-size:.83rem}
-.secondary:hover{background:#e5ebfe}
-.refresh-button{color:#e1e8fc;background:#253451;border-color:#455472}
-.refresh-button:hover{background:#354764}
-:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
-.topbar :focus-visible{outline-color:#b2c2ff}
-.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:29px}
-.kpi{box-shadow:var(--shadow);background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:15px 16px}
-.kpi-label{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.86rem;font-weight:650}
-.kpi strong{display:block;margin:9px 0 10px;font:700 clamp(1.46rem,3vw,2.15rem)/1.12 var(--mono);letter-spacing:-.06em}
-.indicator{width:8px;height:8px;flex:0 0 auto;border-radius:50%;display:inline-block;background:#a0adc1}
-.indicator.online,.indicator.free{background:#2da777}
-.indicator.reserved{background:#8266cc}
-.indicator.running{background:#db873d}
-progress{display:block;appearance:none;width:100%;height:5px;border:none;border-radius:10px;overflow:hidden;background:#edf1f8;--meter:#5779e7}
-progress::-webkit-progress-bar{background:#edf1f8}
-progress::-webkit-progress-value{background:var(--meter);border-radius:10px}
+h1,h2,h3,p,ul{margin:0}
+ul{padding:0;list-style:none}
+main{max-width:1440px;margin:auto;padding:36px 28px 64px}
+.eyebrow{display:block;color:var(--green);font-size:.7rem;font-weight:760;letter-spacing:.16em;text-transform:uppercase}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:18px}
+h1{font-size:clamp(2rem,4vw,2.8rem);font-weight:760;letter-spacing:-.04em;line-height:1.2;margin:10px 0 6px}
+.hero-meta{color:var(--muted);font-size:.84rem}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+button{cursor:pointer;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--ink);padding:10px 16px;font:inherit;font-size:.9rem;font-weight:700;white-space:nowrap;transition:background .15s,border-color .15s,box-shadow .15s}
+button:hover{border-color:#cdd5cf;box-shadow:0 2px 8px #1a2a2010}
+button:disabled{opacity:.5;cursor:default;box-shadow:none}
+.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.primary:hover{background:#4d8c64;border-color:#4d8c64}
+.sm{padding:5px 11px;font-size:.8rem;border-radius:9px}
+.pill{border:none;border-radius:9px;padding:6px 12px;font-size:.8rem}
+.pill.green{background:var(--green-soft);color:var(--green)}
+.pill.red{background:var(--red-soft);color:var(--red)}
+.pill.red:hover{background:#f8dcdc}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
+.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.notice{display:flex;align-items:center;gap:13px;padding:15px 16px;min-width:0}
+.notice.active{border-color:var(--green-line);background:linear-gradient(#fbfdfb,#f6faf7)}
+.notice-icon{flex:0 0 auto;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:760;font-size:.86rem;background:var(--soft);color:var(--muted)}
+.notice.active .notice-icon{background:var(--green-soft);color:var(--green)}
+.notice-icon.amber{background:var(--amber-soft);color:var(--amber)}
+.notice-body{min-width:0;flex:1}
+.notice-body small{display:block;color:var(--muted);font-size:.7rem}
+.notice-body strong{display:block;font-size:.9rem;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notice-body span{display:block;color:var(--faint);font-size:.74rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{flex:0 0 auto;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.badge.green{background:var(--green-soft);color:var(--green)}
+.badge.red{background:var(--red-soft);color:var(--red)}
+.badge.amber{background:var(--amber-soft);color:var(--amber)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.kpi{padding:18px 18px 16px}
+.kpi small{display:block;color:var(--muted);font-size:.78rem;font-weight:650}
+.kpi strong{display:block;font-size:2rem;font-weight:780;letter-spacing:-.03em;line-height:1.2;margin:10px 0 8px;font-variant-numeric:tabular-nums}
+.kpi strong em{font-style:normal;font-size:1rem;color:var(--faint);font-weight:650;margin-left:4px}
+.kpi span{display:block;color:var(--faint);font-size:.78rem}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.section{padding:22px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+h2{font-size:1.3rem;font-weight:720;margin-top:8px}
+.tools{display:flex;align-items:flex-end;gap:9px;flex-wrap:wrap}
+.field{display:block;margin:0;font-size:.7rem;font-weight:700;color:var(--muted)}
+.field input,.field select{margin-top:5px}
+input:not([type=checkbox]),select{display:block;width:100%;padding:8px 11px;border:1px solid var(--rule);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:.84rem}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px #5c9d7422}
+#search{width:180px}
+.tools select{width:auto;min-width:118px}
+.count{align-self:center;padding:7px 11px;border-radius:10px;background:var(--soft);color:var(--muted);font-size:.78rem;white-space:nowrap}
+.machines{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px}
+.res{border:1px solid var(--rule);border-radius:16px;padding:16px;min-width:0}
+.res-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.state{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;color:var(--muted)}
+.state::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.state.free{color:var(--green)}
+.state.part{color:var(--blue)}
+.state.full{color:var(--amber)}
+.state.off{color:var(--red)}
+.res h3{font-size:1.2rem;font-weight:700;margin:8px 0 2px}
+.res-meta{color:var(--muted);font-size:.78rem}
+.host{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.host span{background:var(--soft);border-radius:7px;padding:2px 8px;color:var(--muted);font-size:.74rem;font-variant-numeric:tabular-nums}
+.npus{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.npu{min-width:0;border:1px solid var(--rule);border-radius:11px;padding:8px 9px;background:#fbfcfb}
+.npu.free{background:#f5faf6;border-color:var(--green-line)}
+.npu.reserved{background:#fdf8ee;border-color:#f0dfbd}
+.npu.running{background:#f5f8fd;border-color:#d8e2f2}
+.npu-head{display:flex;justify-content:space-between;align-items:baseline;gap:4px}
+.npu-head b{font:700 .78rem var(--mono)}
+.npu-head span{color:var(--faint);font-size:.7rem;font-variant-numeric:tabular-nums}
+.npu-head span.warn{color:var(--red);font-weight:700}
+.npu-state{display:block;font-size:.7rem;font-weight:700;margin:3px 0 5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.npu.free .npu-state{color:var(--green)}
+.npu.reserved .npu-state{color:var(--amber)}
+.npu.running .npu-state{color:var(--blue)}
+.npu-row{display:flex;justify-content:space-between;color:var(--muted);font-size:.68rem;font-variant-numeric:tabular-nums}
+.npu-row strong{color:var(--ink);font-weight:650}
+progress{display:block;appearance:none;width:100%;height:4px;border:none;border-radius:4px;overflow:hidden;background:#e9ede9;margin:2px 0 4px;--meter:#6f9fd8}
+progress::-webkit-progress-bar{background:#e9ede9}
+progress::-webkit-progress-value{background:var(--meter);border-radius:4px}
 progress::-moz-progress-bar{background:var(--meter)}
-#online-bar,#free-bar{--meter:#29976f}
-#reserved-bar{--meter:#8064c8}
-#running-bar{--meter:#d17d38}
-.section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:11px}
-h2{font-size:1.22rem;line-height:1.3}
-#filter-count{min-height:1em;color:var(--muted);font-size:.84rem;margin-top:4px}
-.filters{display:flex;align-items:center;gap:8px}
-.filter-label{margin:0;display:flex;align-items:center;gap:7px;color:var(--muted);white-space:nowrap;font-size:.82rem}
-.filter-label select{width:auto;margin:0;padding:6px 25px 6px 9px;font-size:.86rem;font-weight:600}
-.machines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.machine{min-width:0;box-shadow:var(--shadow);background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:15px}
-.machine-head,.card-title,.card-data,.group-row{display:flex;justify-content:space-between;align-items:center;gap:7px}
-.machine-head h3{font-size:1.16rem;font-weight:760;white-space:nowrap}
-.machine-head .state{margin-right:auto}
-.state,.chip-state{font-weight:650;font-size:.76rem;border-radius:999px;white-space:nowrap}
-.state{padding:3px 8px;background:#edf1f8;color:var(--muted)}
-.state.online{background:#e9f7f1;color:var(--green)}
-.state.stale,.attention{color:var(--orange)}
-.state.stale{background:#fff0df}
-.model{font-size:.81rem;color:var(--muted);margin:4px 0 9px}
-.host-metrics{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
-.host-metrics span{background:#f0f3f8;border-radius:5px;padding:3px 7px;color:#435575;font-size:.78rem;font-variant-numeric:tabular-nums}
-.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.card{min-width:0;background:#f8faff;border:1px solid #e3ebf8;border-radius:9px;padding:8px}
-.card.busy{background:#f7f2ff;border-color:#e6d9fb}
-.card-title strong{font:750 .83rem var(--mono);white-space:nowrap}
-.chip-state{display:block;padding:2px 6px;margin:4px 0;max-width:100%;width:max-content;overflow:hidden;text-overflow:ellipsis;background:#edf1f8;color:var(--muted)}
-.chip-state.free{background:#e7f6ee;color:var(--green)}
-.chip-state.reserved{background:#ebdfff;color:var(--purple)}
-.chip-state.running{background:#fdf0e0;color:#8c451b}
-.card-data{color:#435575;font-size:.76rem;font-variant-numeric:tabular-nums}
-.card-data span{white-space:nowrap}
-.card .meter{margin:4px 0 5px;--meter:#5676e2;height:4px}
-.card .memory-meter{--meter:#2c9984}
-.card-foot{margin-top:5px;padding-top:4px;border-top:1px solid #e7edf7}
-.group-row{margin-top:8px;padding-top:6px;border-top:1px solid var(--rule);font-size:.83rem;overflow-wrap:anywhere}
-.group-actions{display:flex;gap:5px}
-.empty{text-align:center;color:var(--muted);border:1px dashed var(--rule);border-radius:12px;padding:28px}
-dialog{width:min(480px,calc(100% - 24px));padding:20px;border:1px solid var(--rule);border-radius:15px;color:var(--ink);background:var(--surface);box-shadow:0 20px 80px #18234940}
-dialog::backdrop{background:#17253475}
-.dialog-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
-.close{font-size:1.15rem;padding:0 7px}
-label{display:block;margin:10px 0;font-weight:650;font-size:.92rem}
-input:not([type=checkbox]),select{display:block;width:100%;margin:4px 0 0;padding:7px 9px;border:1px solid #ccd8eb;border-radius:8px;background:var(--surface);color:var(--ink);font:inherit}
-fieldset{margin:9px 0;padding:7px 9px;border:1px solid var(--rule);border-radius:8px}
-legend{font-weight:680}
+progress.hbm{--meter:#7fb592}
+.groups{margin-top:10px}
+.group{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;margin-top:6px;border-radius:10px;background:var(--amber-soft);font-size:.78rem;color:#5d4310}
+.group span{overflow-wrap:anywhere}
+.group-actions{display:flex;gap:5px;flex:0 0 auto}
+.group-actions button{background:#fff;border-color:#efdcb5}
+.res-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);color:var(--muted);font-size:.78rem}
+.empty{text-align:center;color:var(--muted);border:1px dashed var(--rule);border-radius:14px;padding:30px;font-size:.86rem}
+.activity{position:sticky;top:16px}
+.activity select{margin-bottom:14px}
+.act-actions{display:flex;justify-content:space-between;align-items:center;margin:-4px 0 10px;color:var(--faint);font-size:.72rem}
+.act-actions button{border:none;background:none;padding:0;color:var(--faint);font-size:.72rem;font-weight:600;box-shadow:none}
+.act-actions button:hover{color:var(--red)}
+.timeline{max-height:600px;overflow-y:auto;padding-right:4px;scrollbar-width:thin}
+.act{position:relative;padding:0 0 18px 20px}
+.act::before{content:"";position:absolute;left:4px;top:14px;bottom:0;width:1px;background:var(--rule)}
+.act:last-child::before{display:none}
+.act::after{content:"";position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.act.release::after,.act.expire::after,.act.offline::after{background:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+.act.extend::after{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.act.job-start::after,.act.job-stop::after{background:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.act-head{display:flex;align-items:center;gap:8px;font-size:.84rem}
+.tag{font-size:.7rem;font-weight:700;color:var(--green)}
+.tag.auto{color:var(--faint)}
+.act p{color:var(--muted);font-size:.76rem;margin-top:2px;overflow-wrap:anywhere}
+.act time{display:block;color:var(--faint);font-size:.7rem;margin-top:5px;font-variant-numeric:tabular-nums}
+.timeline .empty{padding:20px 14px;font-size:.78rem}
+dialog{width:min(500px,calc(100% - 24px));padding:24px;border:1px solid var(--rule);border-radius:20px;color:var(--ink);background:var(--surface);box-shadow:0 24px 80px #18241c30}
+dialog.wide{width:min(1040px,calc(100% - 24px))}
+dialog::backdrop{background:#17231c59}
+.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dialog-head h2{margin-top:6px}
+.close{font-size:1.1rem;padding:3px 10px;line-height:1.2}
+label{display:block;margin:12px 0;font-weight:650;font-size:.86rem}
+label input,label select{margin-top:5px}
+fieldset{margin:12px 0;padding:10px 12px;border:1px solid var(--rule);border-radius:12px}
+legend{font-weight:680;font-size:.86rem;padding:0 4px}
 .form-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.choices label{margin:0;font-size:.8rem;white-space:nowrap}
-.choices input{accent-color:var(--blue)}
-#employee-note{font-size:.81rem;color:var(--muted);margin:-5px 0 10px}
-#form-error{color:#ad243d;font-size:.86rem;margin:8px 0}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.choices label{margin:0;font-size:.8rem;font-weight:550;white-space:nowrap}
+.choices input{accent-color:var(--primary)}
+#employee-note{font-size:.76rem;color:var(--muted);margin:-6px 0 8px}
+#form-error{color:var(--red);font-size:.84rem;margin:8px 0}
 #form-error:empty{display:none}
-#notice{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:10px 14px;border-radius:9px;background:#142953;color:#fff;max-width:90vw}
-@media(max-width:1120px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:800px){.machines{grid-template-columns:1fr}.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:560px){main{padding:23px 12px 48px}.top-inner{padding:0 12px;min-height:55px}.top-actions{gap:7px}.refresh-state{font-size:.7rem}.hero{gap:8px;margin-bottom:16px}.hero p{font-size:.81rem}.hero button{padding:7px 8px}.summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:20px}.kpi{padding:9px 11px}.kpi-label{font-size:.78rem}.section-heading{display:block}.filters{margin-top:6px;justify-content:space-between}.filter-label{gap:4px}.filter-label select{padding-right:10px;max-width:145px}.machine{padding:11px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#submit{width:100%;margin-top:6px}
+.usage-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.usage-stats .kpi{box-shadow:none;background:var(--soft);border:none;border-radius:14px;padding:14px 16px}
+.usage-stats .kpi strong{font-size:1.6rem;margin:6px 0 2px}
+h3.sub{font-size:.95rem;font-weight:700;margin:4px 0 10px}
+.trends{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:20px}
+.trend{border:1px solid var(--rule);border-radius:14px;padding:13px 14px}
+.trend-head{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;font-weight:700}
+.trend-head span{font:700 1.05rem var(--mono);color:var(--green)}
+.trend svg{display:block;width:100%;height:64px;margin:8px 0 6px;background:linear-gradient(#0000 49.5%,#eef1ee 50%,#0000 50.5%)}
+.trend polyline{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.trend .util{stroke:var(--primary)}
+.trend .mem{stroke:#c6cfc9;stroke-dasharray:3 3}
+.trend p{color:var(--muted);font-size:.72rem}
+.trend .nodata{display:grid;place-items:center;height:64px;margin:8px 0 6px;border-radius:9px;background:var(--soft);color:var(--faint);font-size:.74rem}
+.legend{display:flex;gap:14px;color:var(--muted);font-size:.72rem;margin:-4px 0 10px}
+.legend i{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:5px;background:var(--primary)}
+.legend i.mem{background:#c6cfc9}
+.table-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{color:var(--muted);font-size:.72rem;font-weight:700;background:var(--soft)}
+tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums}
+.footnote{color:var(--faint);font-size:.72rem;margin-top:12px}
+#notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:12px;background:#1f3a2a;color:#fff;max-width:90vw;font-size:.88rem;box-shadow:0 10px 30px #17231c40}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}.activity{position:static}.timeline{max-height:420px}}
+@media(max-width:900px){.strip{grid-template-columns:1fr}.kpis,.usage-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.machines{grid-template-columns:1fr}}
+@media(max-width:620px){main{padding:24px 12px 48px}.hero{flex-direction:column;align-items:flex-start}.hero-actions button{padding:8px 12px}.section{padding:16px}.npus{grid-template-columns:repeat(2,minmax(0,1fr))}#search{width:100%}.tools,.tools .field{width:100%}.tools select{width:100%}.form-columns{grid-template-columns:1fr}dialog{padding:18px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="top-inner">
-      <a class="brand" href="./" aria-label="返回 NPU 资源看板"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>NPU 资源看板</span></a>
-      <div class="top-actions"><span id="refresh" class="refresh-state" role="status">正在加载</span><button id="reload" class="secondary refresh-button" type="button">刷新</button></div>
-    </div>
-  </header>
   <main>
     <section class="hero" aria-labelledby="heading">
       <div>
-        <h1 id="heading">集群总览</h1>
-        <p id="cluster-note">昇腾 950DT · 团队用卡与机器负载</p>
+        <span class="eyebrow">NPU Cluster · Ascend 950DT</span>
+        <h1 id="heading">资源占用</h1>
+        <p id="hero-meta" class="hero-meta">正在加载…</p>
       </div>
-      <button id="reserve" type="button">＋ 登记占用</button>
+      <div class="hero-actions">
+        <button id="open-usage" type="button">使用看板</button>
+        <button id="reload" type="button">刷新</button>
+        <button id="reserve" class="primary" type="button">登记占用</button>
+      </div>
     </section>
-    <section class="summary" aria-label="资源概览">
-      <div class="kpi"><span class="kpi-label"><i class="indicator online"></i>在线机器</span><strong id="online">—</strong><progress id="online-bar" aria-label="在线机器占比" max="1" value="0"></progress></div>
-      <div class="kpi"><span class="kpi-label"><i class="indicator reserved"></i>已登记 NPU</span><strong id="registered">—</strong><progress id="reserved-bar" aria-label="已登记卡占比" max="1" value="0"></progress></div>
-      <div class="kpi"><span class="kpi-label"><i class="indicator running"></i>有进程的 NPU</span><strong id="running">—</strong><progress id="running-bar" aria-label="有进程卡占比" max="1" value="0"></progress></div>
-      <div class="kpi"><span class="kpi-label"><i class="indicator free"></i>无进程且未登记</span><strong id="free">—</strong><progress id="free-bar" aria-label="无进程且未登记卡占比" max="1" value="0"></progress></div>
+
+    <section class="strip" aria-label="提醒">
+      <div id="sync-card" class="panel notice">
+        <div class="notice-icon" aria-hidden="true">15s</div>
+        <div class="notice-body"><small>数据同步</small><strong>每 15 秒自动刷新</strong><span id="sync-text">正在连接看板服务</span></div>
+        <span id="sync-badge" class="badge">连接中</span>
+      </div>
+      <div id="expiry-card" class="panel notice">
+        <div class="notice-icon amber" aria-hidden="true">⏱</div>
+        <div class="notice-body"><small>即将到期</small><strong id="expiry-title">当前没有登记</strong><span id="expiry-text">登记到期后会自动释放</span></div>
+        <span id="expiry-badge" class="badge" hidden></span>
+      </div>
+      <div id="mine-card" class="panel notice">
+        <div class="notice-icon" aria-hidden="true">我</div>
+        <div class="notice-body"><small>我的登记</small><strong id="mine-title">本浏览器暂无登记</strong><span id="mine-text">在本浏览器登记的占用可以续期或释放</span></div>
+        <button id="release-mine" class="pill red" type="button" hidden>释放我的</button>
+      </div>
     </section>
-    <section class="fleet" aria-labelledby="fleet-title">
-      <div class="section-heading">
-        <div><h2 id="fleet-title">机器与 NPU</h2><p id="filter-count" role="status"></p></div>
-        <div class="filters">
-          <label class="filter-label">机器<select id="machine-filter"><option value="">全部机器</option></select></label>
-          <label class="filter-label">卡状态<select id="card-filter"><option value="">全部状态</option><option value="free">无进程且未登记</option><option value="reserved">已登记</option><option value="running">有进程</option><option value="unknown">数据缺失</option></select></label>
+
+    <section class="kpis" aria-label="资源概览">
+      <div class="panel kpi"><small>在线机器</small><strong id="kpi-online">—</strong><span id="kpi-online-note">—</span></div>
+      <div class="panel kpi"><small>空闲 NPU</small><strong id="kpi-free">—</strong><span id="kpi-free-note">无进程且未登记</span></div>
+      <div class="panel kpi"><small>已登记 NPU</small><strong id="kpi-reserved">—</strong><span id="kpi-reserved-note">—</span></div>
+      <div class="panel kpi"><small>有进程 NPU</small><strong id="kpi-running">—</strong><span id="kpi-running-note">—</span></div>
+    </section>
+
+    <div class="layout">
+      <section class="panel section" aria-labelledby="fleet-title">
+        <div class="section-head">
+          <div><span class="eyebrow">Live Resources</span><h2 id="fleet-title">资源状态</h2></div>
+          <div class="tools">
+            <label class="field">搜索资源<input id="search" type="search" placeholder="机器名或团队" autocomplete="off"></label>
+            <label class="field">机器<select id="machine-filter"><option value="">全部机器</option></select></label>
+            <label class="field">卡状态<select id="card-filter"><option value="">全部状态</option><option value="free">空闲</option><option value="reserved">已登记</option><option value="running">有进程</option><option value="unknown">数据缺失</option></select></label>
+            <span id="filter-count" class="count" role="status">—</span>
+          </div>
         </div>
-      </div>
-      <div id="machines" class="machines"></div>
-      <p id="empty" class="empty" hidden>当前筛选条件下没有 NPU。</p>
-    </section>
+        <div id="machines" class="machines"></div>
+        <p id="empty" class="empty" hidden>当前筛选条件下没有 NPU。</p>
+      </section>
+
+      <aside class="panel section activity" aria-labelledby="activity-title">
+        <span class="eyebrow">Activity</span>
+        <h2 id="activity-title">使用记录</h2>
+        <label class="field"><span hidden>筛选资源</span><select id="activity-filter" aria-label="筛选使用记录"><option value="">全部资源</option></select></label>
+        <div class="act-actions"><span id="activity-count">0 条记录</span><button id="clear-activity" type="button">清空记录</button></div>
+        <ul id="timeline" class="timeline"></ul>
+      </aside>
+    </div>
   </main>
+
   <dialog id="dialog" aria-labelledby="form-title">
     <form id="form">
-      <div class="dialog-heading"><h2 id="form-title">登记占用</h2><button id="close" class="secondary close" aria-label="关闭" type="button">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow">Reserve</span><h2 id="form-title">登记占用</h2></div><button id="close" class="close" aria-label="关闭" type="button">×</button></div>
       <div id="fields">
         <label>机器<select id="machine"></select></label>
         <fieldset><legend>选择 NPU</legend><div id="choices" class="choices"></div></fieldset>
@@ -149,34 +246,62 @@ legend{font-weight:680}
           <label>团队名称<input id="team" required maxlength="64" placeholder="输入团队名称" autocomplete="organization"></label>
           <label>工号<input id="employee" required maxlength="32" placeholder="输入工号" autocomplete="off" aria-describedby="employee-note"></label>
         </div>
-        <p id="employee-note">公开看板最多显示工号末四位。</p>
+        <p id="employee-note">工号会公开显示在看板上。</p>
       </div>
       <label>预计结束时间<input id="ends" type="datetime-local" required></label>
       <p id="form-error" role="alert"></p>
-      <button id="submit" type="submit">确认登记</button>
+      <button id="submit" class="primary" type="submit">确认登记</button>
     </form>
+  </dialog>
+
+  <dialog id="usage" class="wide" aria-labelledby="usage-title">
+    <div class="dialog-head"><div><span class="eyebrow">Usage · 近 24 小时</span><h2 id="usage-title">使用看板</h2></div><button id="close-usage" class="close" aria-label="关闭" type="button">×</button></div>
+    <div class="usage-stats">
+      <div class="kpi"><small>平均算力利用率</small><strong id="u-util">—</strong><span>在线机器全部 NPU 平均</span></div>
+      <div class="kpi"><small>平均有进程 NPU</small><strong id="u-busy">—</strong><span id="u-busy-note">—</span></div>
+      <div class="kpi"><small>峰值有进程 NPU</small><strong id="u-peak">—</strong><span id="u-peak-note">—</span></div>
+      <div class="kpi"><small>登记次数</small><strong id="u-reserves">—</strong><span id="u-reserves-note">—</span></div>
+    </div>
+    <h3 class="sub">机器趋势</h3>
+    <div class="legend"><span><i></i>算力利用率</span><span><i class="mem"></i>HBM 占用</span></div>
+    <div id="trends" class="trends"></div>
+    <h3 class="sub">团队占用</h3>
+    <div class="table-wrap"><table><thead><tr><th>团队</th><th>当前登记卡数</th><th>机器</th><th>最近到期</th><th>24 小时登记次数</th></tr></thead><tbody id="teams"></tbody></table></div>
+    <p class="footnote">趋势和使用记录来自本浏览器打开看板期间的采样：每分钟一个采样点，保留 24 小时；使用记录最多保留 400 条。</p>
   </dialog>
   <div id="notice" role="status" hidden></div>
   <script>const apiOrigin = document.querySelector('meta[name=board-api-origin]')?.content || location.origin;
 const apiUrl = path => new URL(path, apiOrigin);
 const el = id => document.getElementById(id);
 const dialog = el('dialog');
+const usageDialog = el('usage');
 const dateFormat = new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 const time = value => dateFormat.format(new Date(value));
 const percent = value => value == null ? '—' : value + '%';
+const rounded = value => value == null ? '—' : Math.round(value) + '%';
+const DAY = 86_400_000;
 let board;
 let editing;
 let noticeTimer;
 let refreshing = false;
 const managementKey = 'npu-board-owner-v1';
 const reservationsKey = 'npu-board-reservations-v1';
+const activityKey = 'npu-board-activity-v1';
+const snapshotKey = 'npu-board-snapshot-v1';
+const samplesKey = 'npu-board-samples-v1';
+const mineKey = 'npu-board-mine-v1';
 const storage = {
   get(key) { try { return localStorage.getItem(key); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, value); } catch { /* Browser can still manage this visit. */ } },
 };
+function loadJson(key, fallback) {
+  try { return JSON.parse(storage.get(key) || 'null') ?? fallback; } catch { return fallback; }
+}
 let key = storage.get(managementKey);
-let owned;
-try { owned = JSON.parse(storage.get(reservationsKey) || '{}') || {}; } catch { owned = {}; }
+let owned = loadJson(reservationsKey, {});
+let activity = loadJson(activityKey, []);
+let samples = loadJson(samplesKey, []);
+let mine = new Set(loadJson(mineKey, []));
 
 function node(tag, content, className) {
   const item = document.createElement(tag);
@@ -185,8 +310,8 @@ function node(tag, content, className) {
   return item;
 }
 
-function button(text, action) {
-  const item = node('button', text, 'subtle');
+function button(text, action, className = 'sm') {
+  const item = node('button', text, className);
   item.type = 'button';
   item.addEventListener('click', action);
   return item;
@@ -216,6 +341,11 @@ function remember(id, expires) {
   storage.set(reservationsKey, JSON.stringify(owned));
 }
 
+function claim(id) {
+  mine.add(String(id));
+  storage.set(mineKey, JSON.stringify([...mine].slice(-200)));
+}
+
 async function api(path, method, body) {
   const response = await fetch(apiUrl(path), {
     method,
@@ -226,6 +356,34 @@ async function api(path, method, body) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || '操作失败，请重试');
   return data;
+}
+
+function ranges(ids) {
+  const sorted = [...ids].sort((a, b) => a - b);
+  const parts = [];
+  for (let i = 0; i < sorted.length; i++) {
+    let j = i;
+    while (j + 1 < sorted.length && sorted[j + 1] === sorted[j] + 1) j++;
+    parts.push(j > i ? sorted[i] + '–' + sorted[j] : String(sorted[i]));
+    i = j;
+  }
+  return parts.join(', ');
+}
+
+function cardsText(machine, reservation) {
+  return reservation.cards.length === machine.cards.length ? '整机 ' + machine.cards.length + ' 卡' : 'NPU ' + ranges(reservation.cards);
+}
+
+function who(reservation) {
+  const employee = reservation.employee || reservation.employeeSuffix;
+  return reservation.team + (employee ? ' · 工号 ' + employee : '');
+}
+
+function remaining(ms) {
+  if (ms <= 0) return '已到期';
+  const hours = Math.floor(ms / 3_600_000);
+  const minutes = Math.floor(ms % 3_600_000 / 60_000);
+  return hours ? hours + ' 小时 ' + minutes + ' 分' : Math.max(1, minutes) + ' 分钟';
 }
 
 function observe(machine, id) {
@@ -241,7 +399,7 @@ function observe(machine, id) {
 }
 
 function meter(label, value, extraClass = '') {
-  const element = node('progress', null, 'meter ' + extraClass);
+  const element = node('progress', null, extraClass);
   element.max = 100;
   element.value = value ?? 0;
   element.setAttribute('aria-label', label + ' ' + percent(value));
@@ -249,112 +407,377 @@ function meter(label, value, extraClass = '') {
 }
 
 function cardView({ id, reading, reservation, hasProcess, available, unknown }) {
-  const card = node('article', null, 'card' + (reservation ? ' busy' : ''));
-  const heading = node('div', null, 'card-title');
-  heading.append(node('strong', 'NPU ' + id));
   const condition = reservation ? 'reserved' : hasProcess ? 'running' : available ? 'free' : '';
-  const statusLabel = reservation?.team || (hasProcess ? '有进程' : available ? '未登记 · 无进程' :
-    unknown ? '数据缺失' : '计算活跃');
-  const badge = node('span', statusLabel, 'chip-state ' + condition);
-  badge.title = reservation ? reservation.team + ' · 至 ' + time(reservation.endsAt) : statusLabel;
+  const card = node('div', null, 'npu ' + condition);
+  const heading = node('div', null, 'npu-head');
+  const warning = reading?.health === 'warning';
+  heading.append(node('b', 'NPU ' + id), node('span',
+    warning ? '异常' : reading?.temperature != null ? reading.temperature + '°C' : '—', warning ? 'warn' : ''));
+  const label = reservation?.team || (hasProcess ? '有进程 · ' + reading.processes : available ? '空闲' : unknown ? '数据缺失' : '计算活跃');
+  const state = node('span', label, 'npu-state');
+  card.title = reservation ? who(reservation) + ' · 至 ' + time(reservation.endsAt) : label;
 
-  const hbm = reading?.hbmUsed != null && reading?.hbmTotal
-    ? (reading.hbmUsed / 1024).toFixed(1) + '/' + (reading.hbmTotal / 1024).toFixed(0)
-    : '—';
-  const hbmPercent = hbm === '—' ? null : Math.round(100 * reading.hbmUsed / reading.hbmTotal);
-  const compute = node('div', null, 'card-data');
-  compute.append(node('span', '计算'), node('strong', percent(reading?.utilization)));
-  const memory = node('div', null, 'card-data');
-  memory.append(node('span', 'HBM'), node('strong', hbm === '—' ? hbm : hbm + ' GiB'));
-  const detail = node('div', null, 'card-data card-foot');
-  detail.append(node('span', '进程 ' + (reading?.processes ?? '—')), node('span',
-    reading?.health === 'warning' ? '异常' : reading?.temperature != null ? reading.temperature + ' °C' : '—',
-    reading?.health === 'warning' ? 'attention' : ''));
-  card.append(heading, badge, compute, meter('计算使用率', reading?.utilization),
-    memory, meter('HBM 使用率', hbmPercent, 'memory-meter'), detail);
+  const hbmPercent = reading?.hbmUsed != null && reading?.hbmTotal ? Math.round(100 * reading.hbmUsed / reading.hbmTotal) : null;
+  const compute = node('div', null, 'npu-row');
+  compute.append(node('span', '算力'), node('strong', percent(reading?.utilization)));
+  const memory = node('div', null, 'npu-row');
+  memory.append(node('span', 'HBM'), node('strong', hbmPercent == null ? '—'
+    : (reading.hbmUsed / 1024).toFixed(1) + '/' + (reading.hbmTotal / 1024).toFixed(0) + 'G'));
+  card.append(heading, state, compute, meter('算力利用率', reading?.utilization),
+    memory, meter('HBM 占用率', hbmPercent, 'hbm'));
   return card;
 }
 
-function machineView(machine, observations) {
-  const section = node('section', null, 'machine');
-  const heading = node('div', null, 'machine-head');
+function machineState(machine, observations) {
+  if (machine.status !== 'online') return { cls: 'off', text: machine.status === 'stale' ? '数据中断' : '等待接入' };
+  const free = observations.filter(card => card.available).length;
+  if (free === observations.length) return { cls: 'free', text: '空闲' };
+  if (free === 0) return { cls: 'full', text: '满载' };
+  return { cls: 'part', text: '部分空闲' };
+}
+
+async function release(reservation) {
+  if (!window.confirm('释放 ' + reservation.team + ' 的这次登记？')) return;
+  try {
+    await api('/api/reservations/' + reservation.id, 'DELETE');
+    claim(reservation.id);
+    remember(reservation.id, 0);
+    await refresh();
+    notify('已释放占用');
+  } catch (error) {
+    notify(error.message);
+  }
+}
+
+function machineView(machine, all, shown) {
+  const section = node('article', null, 'res');
+  const state = machineState(machine, all);
+  const top = node('div', null, 'res-top');
+  top.append(node('span', state.text, 'state ' + state.cls), button('登记', () => showForm(machine.id)));
   const name = node('h3', machine.name);
   name.id = 'machine-' + machine.id;
   section.setAttribute('aria-labelledby', name.id);
-  const status = { online: '在线', stale: '数据中断', pending: '等待接入' }[machine.status];
-  heading.append(name, node('span', status, 'state ' + machine.status));
-  heading.append(button('登记', () => showForm(machine.id)));
-  const model = machine.model + ' · ' + machine.cards.length + ' 张卡';
-  const last = machine.receivedAt ? ' · 采样 ' + time(machine.receivedAt) : '';
+  const meta = machine.model + ' · ' + machine.cards.length + ' 张卡' + (machine.receivedAt ? ' · 采样 ' + time(machine.receivedAt) : '');
   const host = machine.metrics;
-  const cards = node('div', null, 'cards');
-  cards.append(...observations.map(cardView));
+  const hostMetrics = node('div', null, 'host');
+  hostMetrics.append(node('span', 'CPU ' + percent(host?.cpu)), node('span', '内存 ' + percent(host?.memory)),
+    node('span', '根磁盘 ' + percent(host?.disk)));
+  const cards = node('div', null, 'npus');
+  cards.append(...shown.map(cardView));
+
   const groups = node('div', null, 'groups');
   for (const reservation of machine.reservations) {
-    const row = node('div', null, 'group-row');
-    const selected = reservation.cards.length === machine.cards.length ? '整机' : 'NPU ' + reservation.cards.join(', ');
-    const identity = reservation.team + (reservation.employeeSuffix ? ' · 工号 ••••' + reservation.employeeSuffix : '');
-    row.append(node('span', identity + ' · ' + selected + ' · 至 ' + time(reservation.endsAt)));
+    const row = node('div', null, 'group');
+    row.append(node('span', who(reservation) + ' · ' + cardsText(machine, reservation) + ' · 至 ' + time(reservation.endsAt)));
     if (owned[reservation.id]) {
       const actions = node('span', null, 'group-actions');
-      actions.append(button('续期', () => showForm(machine.id, reservation)), button('释放', async () => {
-        if (!window.confirm('释放 ' + reservation.team + ' 的这次登记？')) return;
-        try {
-          await api('/api/reservations/' + reservation.id, 'DELETE');
-          remember(reservation.id, 0);
-          await refresh();
-          notify('已释放占用');
-        } catch (error) {
-          notify(error.message);
-        }
-      }));
+      actions.append(button('续期', () => showForm(machine.id, reservation)), button('释放', () => release(reservation)));
       row.append(actions);
     }
     groups.append(row);
   }
-  const hostMetrics = node('div', null, 'host-metrics');
-  hostMetrics.append(node('span', 'CPU ' + percent(host?.cpu)), node('span', '内存 ' + percent(host?.memory)),
-    node('span', '根磁盘 ' + percent(host?.disk)));
-  section.append(heading, node('p', model + last, 'model'), hostMetrics, cards, groups);
+
+  const foot = node('div', null, 'res-foot');
+  const free = all.filter(card => card.available).length;
+  const readings = all.map(card => card.reading?.utilization).filter(value => value != null);
+  foot.append(node('span', machine.status === 'online' ? (free ? '可立即占用 ' + free + ' 张' : '暂无可立即占用的卡') : '暂无实时数据'),
+    node('span', readings.length ? '平均算力 ' + rounded(readings.reduce((a, b) => a + b, 0) / readings.length) : '—'));
+  section.append(top, name, node('p', meta, 'res-meta'), hostMetrics, cards, groups, foot);
   return section;
 }
 
-function setKpi(label, bar, value, total) {
-  el(label).textContent = value == null ? '—' : value + ' / ' + total;
-  el(bar).max = Math.max(1, total);
-  el(bar).value = value ?? 0;
+function snapshot(data) {
+  return {
+    now: data.now,
+    machines: data.machines.map(machine => ({
+      id: machine.id, name: machine.name, status: machine.status, cards: machine.cards,
+      reservations: machine.reservations.map(({ id, team, employee, employeeSuffix, cards, endsAt }) => ({ id, team, employee, employeeSuffix, cards, endsAt })),
+      busy: machine.status === 'online' && machine.metrics
+        ? machine.metrics.cards.filter(card => card.processes > 0).map(card => card.id) : null,
+    })),
+  };
+}
+
+function diff(previous, next) {
+  const events = [];
+  const at = next.now;
+  const before = new Map(previous.machines.map(machine => [machine.id, machine]));
+  const push = (machine, type, title, detail, extra = {}) => events.push({ t: at, machine: machine.id, type, title, detail, ...extra });
+  for (const machine of next.machines) {
+    const prior = before.get(machine.id);
+    if (!prior) continue;
+    if (prior.status !== machine.status) {
+      if (machine.status === 'online') push(machine, 'online', '机器恢复在线', machine.name);
+      else push(machine, 'offline', machine.status === 'stale' ? '机器数据中断' : '机器等待接入', machine.name);
+    }
+    const priorReservations = new Map(prior.reservations.map(item => [item.id, item]));
+    const nextIds = new Set(machine.reservations.map(item => item.id));
+    for (const reservation of machine.reservations) {
+      const old = priorReservations.get(reservation.id);
+      const extra = { team: reservation.team, mine: mine.has(String(reservation.id)) };
+      if (!old) {
+        push(machine, 'reserve', '登记占用', machine.name + ' · ' + cardsText(machine, reservation) + ' · ' + who(reservation) + ' · 至 ' + time(reservation.endsAt), extra);
+      } else if (old.endsAt !== reservation.endsAt) {
+        push(machine, 'extend', '续期占用', machine.name + ' · ' + who(reservation) + ' · 至 ' + time(reservation.endsAt), extra);
+      }
+    }
+    for (const reservation of prior.reservations) {
+      if (nextIds.has(reservation.id)) continue;
+      const expired = reservation.endsAt <= at + 30_000;
+      push(machine, expired ? 'expire' : 'release', expired ? '到期释放' : '释放占用',
+        machine.name + ' · ' + cardsText(machine, reservation) + ' · ' + who(reservation),
+        { team: reservation.team, mine: !expired && mine.has(String(reservation.id)) });
+    }
+    if (prior.busy && machine.busy) {
+      const started = machine.busy.filter(id => !prior.busy.includes(id));
+      const stopped = prior.busy.filter(id => !machine.busy.includes(id));
+      if (started.length) push(machine, 'job-start', '任务启动', machine.name + ' · NPU ' + ranges(started) + ' 出现进程');
+      if (stopped.length) push(machine, 'job-stop', '任务结束', machine.name + ' · NPU ' + ranges(stopped) + ' 进程已退出');
+    }
+  }
+  return events;
+}
+
+function track(data) {
+  const next = snapshot(data);
+  const previous = loadJson(snapshotKey, null);
+  if (previous?.machines) {
+    const events = diff(previous, next);
+    if (events.length) {
+      activity = [...events.reverse(), ...loadJson(activityKey, [])].slice(0, 400);
+      storage.set(activityKey, JSON.stringify(activity));
+    }
+  }
+  storage.set(snapshotKey, JSON.stringify(next));
+
+  if (!samples.length || data.now - samples[samples.length - 1].t >= 55_000) {
+    samples.push({
+      t: data.now,
+      m: data.machines.map(machine => {
+        if (machine.status !== 'online' || !machine.metrics) return [machine.id, null, null, null, machine.reservations.flatMap(item => item.cards).length];
+        const cards = machine.metrics.cards;
+        const util = cards.filter(card => card.utilization != null);
+        const used = cards.reduce((total, card) => total + (card.hbmUsed || 0), 0);
+        const capacity = cards.reduce((total, card) => total + (card.hbmTotal || 0), 0);
+        return [machine.id,
+          util.length ? Math.round(util.reduce((total, card) => total + card.utilization, 0) / util.length) : null,
+          capacity ? Math.round(100 * used / capacity) : null,
+          cards.filter(card => card.processes > 0).length,
+          machine.reservations.flatMap(item => item.cards).length];
+      }),
+    });
+    samples = samples.filter(sample => sample.t > data.now - DAY);
+    storage.set(samplesKey, JSON.stringify(samples));
+  }
+}
+
+function renderActivity() {
+  const filter = el('activity-filter');
+  if (filter.options.length === 1 && board) {
+    filter.append(...board.machines.map(machine => new Option(machine.name, machine.id)));
+  }
+  const items = activity.filter(item => !filter.value || item.machine === Number(filter.value));
+  el('activity-count').textContent = items.length + ' 条记录';
+  el('clear-activity').hidden = !activity.length;
+  if (!items.length) {
+    el('timeline').replaceChildren(node('li', '暂无记录。看板打开期间检测到的登记、续期、释放和任务变化会出现在这里。', 'empty'));
+    return;
+  }
+  el('timeline').replaceChildren(...items.map(item => {
+    const entry = node('li', null, 'act ' + item.type);
+    const head = node('div', null, 'act-head');
+    head.append(node('strong', item.title), node('span', item.mine ? '网页操作' : '自动检测', 'tag' + (item.mine ? '' : ' auto')));
+    const stamp = node('time', time(item.t));
+    stamp.dateTime = new Date(item.t).toISOString();
+    entry.append(head, node('p', item.detail), stamp);
+    return entry;
+  }));
+}
+
+function renderStrip(entries) {
+  el('sync-card').classList.add('active');
+  el('sync-badge').textContent = '正常';
+  el('sync-badge').className = 'badge green';
+  el('sync-text').textContent = '上次同步 ' + time(board.now);
+
+  const reservations = entries.flatMap(({ machine }) => machine.reservations.map(reservation => ({ machine, reservation })))
+    .sort((a, b) => a.reservation.endsAt - b.reservation.endsAt);
+  const soonest = reservations[0];
+  el('expiry-badge').hidden = !soonest;
+  el('expiry-card').classList.toggle('active', Boolean(soonest));
+  if (soonest) {
+    const left = soonest.reservation.endsAt - board.now;
+    el('expiry-title').textContent = soonest.machine.name + ' · ' + soonest.reservation.team;
+    el('expiry-text').textContent = cardsText(soonest.machine, soonest.reservation) + ' · ' + time(soonest.reservation.endsAt) + ' 到期 · 共 ' + reservations.length + ' 项登记';
+    el('expiry-badge').textContent = '剩 ' + remaining(left);
+    el('expiry-badge').className = 'badge ' + (left < 3_600_000 ? 'amber' : 'green');
+  } else {
+    el('expiry-title').textContent = '当前没有登记';
+    el('expiry-text').textContent = '登记到期后会自动释放';
+  }
+
+  const mineNow = reservations.filter(item => owned[item.reservation.id]);
+  el('release-mine').hidden = !mineNow.length;
+  el('mine-card').classList.toggle('active', Boolean(mineNow.length));
+  if (mineNow.length) {
+    const cards = mineNow.reduce((total, item) => total + item.reservation.cards.length, 0);
+    el('mine-title').textContent = mineNow.length + ' 项登记 · ' + cards + ' 张卡';
+    el('mine-text').textContent = mineNow.map(item => item.machine.name).filter((name, i, all) => all.indexOf(name) === i).join('、') + ' · 最早 ' + time(mineNow[0].reservation.endsAt) + ' 到期';
+  } else {
+    el('mine-title').textContent = '本浏览器暂无登记';
+    el('mine-text').textContent = '在本浏览器登记的占用可以续期或释放';
+  }
 }
 
 function render() {
   const { machines } = board;
-  const entries = machines.map(machine => ({
-    machine,
-    cards: machine.cards.map(id => observe(machine, id)),
-  }));
+  const entries = machines.map(machine => ({ machine, cards: machine.cards.map(id => observe(machine, id)) }));
   const allCards = entries.flatMap(entry => entry.cards);
+  const total = allCards.length;
   const observed = allCards.some(card => !card.unknown);
-  setKpi('online', 'online-bar', machines.filter(machine => machine.status === 'online').length, machines.length);
-  setKpi('registered', 'reserved-bar', allCards.filter(card => card.reservation).length, allCards.length);
-  setKpi('running', 'running-bar', observed ? allCards.filter(card => card.hasProcess).length : null, allCards.length);
-  setKpi('free', 'free-bar', observed ? allCards.filter(card => card.available).length : null, allCards.length);
+  const online = machines.filter(machine => machine.status === 'online').length;
+  const free = allCards.filter(card => card.available).length;
+  const reserved = allCards.filter(card => card.reservation).length;
+  const running = allCards.filter(card => card.hasProcess).length;
+  const teams = new Set(machines.flatMap(machine => machine.reservations.map(item => item.team)));
+  const utilizations = allCards.map(card => card.reading?.utilization).filter(value => value != null);
+  const kpi = (id, value, of) => {
+    el(id).replaceChildren(document.createTextNode(value == null ? '—' : value));
+    if (value != null) el(id).append(node('em', '/ ' + of));
+  };
+  kpi('kpi-online', online, machines.length);
+  el('kpi-online-note').textContent = online === machines.length ? '全部机器在线' : (machines.length - online) + ' 台无实时数据';
+  kpi('kpi-free', observed ? free : null, total);
+  el('kpi-free-note').textContent = '无进程且未登记 · ' + (observed ? Math.round(100 * free / Math.max(1, total)) + '%' : '—');
+  kpi('kpi-reserved', reserved, total);
+  el('kpi-reserved-note').textContent = teams.size ? teams.size + ' 个团队登记中' : '暂无团队登记';
+  kpi('kpi-running', observed ? running : null, total);
+  el('kpi-running-note').textContent = '全集群平均算力 ' + (utilizations.length ? rounded(utilizations.reduce((a, b) => a + b, 0) / utilizations.length) : '—');
+  el('hero-meta').textContent = machines.length + ' 台机器 · ' + total + ' 张 NPU · 更新于 ' + time(board.now);
+  renderStrip(entries);
 
   const machineFilter = el('machine-filter');
   if (machineFilter.options.length === 1) {
     machineFilter.append(...machines.map(machine => new Option(machine.name, machine.id)));
   }
   const cardFilter = el('card-filter').value;
+  const query = el('search').value.trim().toLowerCase();
   const fits = card => ({
     free: card.available, reserved: Boolean(card.reservation), running: card.hasProcess, unknown: card.unknown,
   })[cardFilter] ?? true;
+  const matches = machine => !query || [machine.name, machine.model, ...machine.reservations.flatMap(item => [item.team, item.employee, item.employeeSuffix])]
+    .some(text => text && String(text).toLowerCase().includes(query));
   const selection = entries
     .filter(entry => !machineFilter.value || entry.machine.id === Number(machineFilter.value))
-    .map(entry => ({ machine: entry.machine, cards: entry.cards.filter(fits) }))
-    .filter(entry => entry.cards.length > 0);
-  const shown = selection.reduce((total, entry) => total + entry.cards.length, 0);
-  el('filter-count').textContent = selection.length + ' 台机器 · ' + shown + ' 张 NPU';
-  el('machines').replaceChildren(...selection.map(entry => machineView(entry.machine, entry.cards)));
+    .filter(entry => matches(entry.machine))
+    .map(entry => ({ ...entry, shown: entry.cards.filter(fits) }))
+    .filter(entry => entry.shown.length > 0);
+  const shown = selection.reduce((sum, entry) => sum + entry.shown.length, 0);
+  el('filter-count').textContent = selection.length + ' 台 · ' + shown + ' 张';
+  el('machines').replaceChildren(...selection.map(entry => machineView(entry.machine, entry.cards, entry.shown)));
   el('empty').hidden = Boolean(selection.length);
   el('reserve').disabled = false;
+  renderActivity();
+  if (usageDialog.open) renderUsage();
+}
+
+const svgNs = 'http://www.w3.org/2000/svg';
+function sparkline(points, start, end) {
+  const svg = document.createElementNS(svgNs, 'svg');
+  svg.setAttribute('viewBox', '0 0 300 64');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('aria-hidden', 'true');
+  const span = Math.max(1, end - start);
+  for (const [index, cls] of [[0, 'util'], [1, 'mem']]) {
+    let segment = [];
+    const flush = () => {
+      if (segment.length > 1) {
+        const line = document.createElementNS(svgNs, 'polyline');
+        line.setAttribute('class', cls);
+        line.setAttribute('points', segment.join(' '));
+        svg.append(line);
+      }
+      segment = [];
+    };
+    let last = null;
+    for (const point of points) {
+      const value = point.v[index];
+      if (value == null || (last != null && point.t - last > 300_000)) flush();
+      if (value != null) segment.push(((point.t - start) / span * 300).toFixed(1) + ',' + (62 - value / 100 * 60).toFixed(1));
+      last = point.t;
+    }
+    flush();
+  }
+  return svg;
+}
+
+function renderUsage() {
+  if (!board) return;
+  const now = board.now;
+  const recent = samples.filter(sample => sample.t > now - DAY);
+  const total = board.machines.reduce((sum, machine) => sum + machine.cards.length, 0);
+  const utilValues = recent.flatMap(sample => sample.m.map(row => row[1]).filter(value => value != null));
+  const busyTotals = recent.map(sample => sample.m.reduce((sum, row) => sum + (row[3] || 0), 0));
+  el('u-util').textContent = utilValues.length ? rounded(utilValues.reduce((a, b) => a + b, 0) / utilValues.length) : '—';
+  el('u-busy').textContent = busyTotals.length ? (busyTotals.reduce((a, b) => a + b, 0) / busyTotals.length).toFixed(1) : '—';
+  el('u-busy-note').textContent = '共 ' + total + ' 张 · ' + recent.length + ' 个采样点';
+  const peak = busyTotals.length ? Math.max(...busyTotals) : null;
+  el('u-peak').textContent = peak ?? '—';
+  const peakAt = peak == null ? null : recent[busyTotals.indexOf(peak)].t;
+  el('u-peak-note').textContent = peakAt ? '出现在 ' + time(peakAt) : '暂无采样';
+  const dayActivity = activity.filter(item => item.t > now - DAY);
+  const reserves = dayActivity.filter(item => item.type === 'reserve');
+  el('u-reserves').textContent = reserves.length;
+  el('u-reserves-note').textContent = '续期 ' + dayActivity.filter(item => item.type === 'extend').length + ' · 释放 '
+    + dayActivity.filter(item => item.type === 'release' || item.type === 'expire').length;
+
+  const start = recent.length ? recent[0].t : now;
+  el('trends').replaceChildren(...board.machines.map(machine => {
+    const points = recent.map(sample => {
+      const row = sample.m.find(item => item[0] === machine.id);
+      return { t: sample.t, v: row ? [row[1], row[2]] : [null, null], busy: row?.[3] };
+    });
+    const valid = points.filter(point => point.v[0] != null);
+    const latest = valid[valid.length - 1];
+    const card = node('div', null, 'trend');
+    const head = node('div', null, 'trend-head');
+    head.append(node('strong', machine.name), node('span', latest ? rounded(latest.v[0]) : '—'));
+    const average = index => valid.length ? rounded(valid.reduce((sum, point) => sum + (point.v[index] ?? 0), 0) / valid.length) : '—';
+    const busyAverage = valid.length ? (valid.reduce((sum, point) => sum + (point.busy || 0), 0) / valid.length).toFixed(1) : '—';
+    card.append(head, valid.length > 1 ? sparkline(points, start, now) : node('div', '采样不足，保持页面打开以积累趋势', 'nodata'),
+      node('p', '平均算力 ' + average(0) + ' · 平均 HBM ' + average(1) + ' · 平均有进程 ' + busyAverage + ' 张'));
+    return card;
+  }));
+
+  const teams = new Map();
+  const team = name => {
+    if (!teams.has(name)) teams.set(name, { cards: 0, machines: new Set(), next: null, count: 0 });
+    return teams.get(name);
+  };
+  for (const machine of board.machines) {
+    for (const reservation of machine.reservations) {
+      const row = team(reservation.team);
+      row.cards += reservation.cards.length;
+      row.machines.add(machine.name);
+      row.next = row.next == null ? reservation.endsAt : Math.min(row.next, reservation.endsAt);
+    }
+  }
+  for (const item of reserves) if (item.team) team(item.team).count++;
+  const rows = [...teams].sort((a, b) => b[1].cards - a[1].cards || b[1].count - a[1].count);
+  if (!rows.length) {
+    const empty = node('tr');
+    const cell = node('td', '近 24 小时没有团队登记');
+    cell.colSpan = 5;
+    empty.append(cell);
+    el('teams').replaceChildren(empty);
+    return;
+  }
+  el('teams').replaceChildren(...rows.map(([name, row]) => {
+    const tr = node('tr');
+    tr.append(node('td', name), node('td', String(row.cards), 'num'), node('td', [...row.machines].join('、') || '—'),
+      node('td', row.next ? time(row.next) + '（剩 ' + remaining(row.next - now) + '）' : '—', 'num'), node('td', String(row.count), 'num'));
+    return tr;
+  }));
 }
 
 async function refresh() {
@@ -364,10 +787,13 @@ async function refresh() {
     const response = await fetch(apiUrl('/api/board'), { cache: 'no-store' });
     if (!response.ok) throw new Error();
     board = await response.json();
+    track(board);
     render();
-    el('refresh').textContent = '同步 ' + time(board.now);
   } catch {
-    el('refresh').textContent = '更新失败，稍后自动重试';
+    el('sync-card').classList.remove('active');
+    el('sync-badge').textContent = '异常';
+    el('sync-badge').className = 'badge red';
+    el('sync-text').textContent = '更新失败，稍后自动重试';
   } finally {
     refreshing = false;
   }
@@ -427,9 +853,31 @@ function showForm(id, reservation) {
 }
 
 el('reload').addEventListener('click', refresh);
+el('search').addEventListener('input', () => { if (board) render(); });
 for (const id of ['machine-filter', 'card-filter']) {
   el(id).addEventListener('change', () => { if (board) render(); });
 }
+el('activity-filter').addEventListener('change', renderActivity);
+el('clear-activity').addEventListener('click', () => {
+  if (!window.confirm('清空本浏览器保存的全部使用记录？')) return;
+  activity = [];
+  storage.set(activityKey, '[]');
+  renderActivity();
+});
+el('open-usage').addEventListener('click', () => { renderUsage(); usageDialog.showModal(); });
+el('close-usage').addEventListener('click', () => usageDialog.close());
+el('release-mine').addEventListener('click', async () => {
+  const targets = board.machines.flatMap(machine => machine.reservations).filter(item => owned[item.id]);
+  if (!targets.length || !window.confirm('释放本浏览器登记的 ' + targets.length + ' 项占用？')) return;
+  const results = await Promise.allSettled(targets.map(async item => {
+    await api('/api/reservations/' + item.id, 'DELETE');
+    claim(item.id);
+    remember(item.id, 0);
+  }));
+  await refresh();
+  const failed = results.filter(result => result.status === 'rejected').length;
+  notify(failed ? failed + ' 项释放失败，请重试' : '已释放 ' + targets.length + ' 项占用');
+});
 el('reserve').disabled = true;
 el('reserve').addEventListener('click', () => showForm());
 el('close').addEventListener('click', () => dialog.close());
@@ -442,6 +890,7 @@ el('form').addEventListener('submit', async event => {
   try {
     if (editing) {
       await api('/api/reservations/' + editing.id, 'PATCH', { endsAt });
+      claim(editing.id);
       remember(editing.id, endsAt);
     } else {
       const team = el('team').value;
@@ -451,6 +900,7 @@ el('form').addEventListener('submit', async event => {
         machineId: Number(el('machine').value), team, endsAt, employee: el('employee').value,
         cards: checked.includes('all') ? 'all' : checked.map(Number),
       });
+      claim(result.id);
       remember(result.id, result.endsAt);
       storage.set('npu-board-team', team);
     }
@@ -459,12 +909,9 @@ el('form').addEventListener('submit', async event => {
     notify(editing ? '已续期' : '已登记占用');
   } catch (error) {
     el('form-error').textContent = error.message;
-    if (!editing) {
-      const previous = el('form-error').textContent;
-      if (previous.includes('已被登记')) {
-        await refresh();
-        renderChoices();
-      }
+    if (!editing && error.message.includes('已被登记')) {
+      await refresh();
+      renderChoices();
     }
   } finally {
     el('submit').disabled = false;
@@ -472,8 +919,11 @@ el('form').addEventListener('submit', async event => {
 });
 window.addEventListener('storage', event => {
   if (event.key === reservationsKey) {
-    try { owned = JSON.parse(event.newValue || '{}'); } catch { owned = {}; }
+    owned = loadJson(reservationsKey, {});
     if (board) render();
+  } else if (event.key === activityKey) {
+    activity = loadJson(activityKey, []);
+    renderActivity();
   }
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });

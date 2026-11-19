@@ -1,0 +1,1 @@
+{"name":"shared-npu-board","private":true,"type":"module","scripts":{"build":"node build.mjs","test":"node --test tests/worker.test.mjs"}}

@@ -1,0 +1,14 @@
+[Unit]
+Description=Cache an NPU resource sample for the read-only SSH account
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/npu-board/mac-cache/cache_sample.py
+StateDirectory=npu-board-cache
+StateDirectoryMode=0755
+TimeoutStartSec=20s
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+PrivateTmp=yes
+Nice=10

@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>NPU 资源看板</title>
   <meta name="board-api-origin" content="https://shared-npu-board-4.aptraisin1.chatgpt.site">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-xQ4505cYzXaEEFROrGCZSVs9kAwcQZXftcp3NQfehP4='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-UAnxk0A/MhqBhkQg4IugyAyEMGjFngsGiWp7guZsM1w='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
   <style>:root{color-scheme:light;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;line-height:1.5;color:#17231c;background:#f5f6f4;--surface:#fff;--ink:#17231c;--muted:#68736c;--faint:#98a29b;--rule:#e3e8e4;--soft:#f3f5f3;--green:#2f7a4d;--green-soft:#e9f3ec;--green-line:#cfe3d5;--primary:#5c9d74;--amber:#93600f;--amber-soft:#fcf1dc;--red:#bf4547;--red-soft:#fcecec;--blue:#3a64a8;--blue-soft:#e8eef8;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;--radius:18px;--shadow:0 1px 3px #1a2a200a}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -381,9 +381,32 @@ async function api(path, method, body) {
   });
   if (response.status === 204) return null;
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || L('操作失败，请重试', 'Request failed, please retry'));
+  if (!response.ok) {
+    const error = new Error(data.error ? L(data.error, serverErrors[data.error] || data.error) : L('操作失败，请重试', 'Request failed, please retry'));
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
+
+const serverErrors = {
+  '请求格式无效': 'Invalid request format',
+  '请求内容为空': 'Request body is empty',
+  '请求内容过长': 'Request body is too large',
+  '请求内容无效': 'Invalid request body',
+  '结束时间须在当前时间 1 分钟后、24 小时内': 'End time must be between 1 minute and 24 hours from now',
+  '请从看板提交登记': 'Please submit reservations from the board',
+  '请选择机器': 'Please select a machine',
+  '请输入有效的团队名称（1 至 32 字）': 'Enter a valid team name (1–32 characters)',
+  '请输入有效工号（2 至 32 位字母、数字或 . _ -）': 'Enter a valid employee ID (2–32 letters, digits or . _ -)',
+  '请选择要占用的 NPU 卡': 'Please select the NPUs to reserve',
+  '所选 NPU 已被登记，请重新选择': 'The selected NPUs are already reserved; please choose again',
+  '无法管理该登记': 'You cannot manage this reservation',
+  '无法更新该登记，续期需晚于原结束时间': 'Cannot update this reservation; the new end time must be later than the current one',
+  '请求来源无效': 'Invalid request origin',
+  '页面不存在': 'Not found',
+  '看板服务暂时不可用，请稍后重试': 'The board service is temporarily unavailable; please try again later',
+};
 
 function ranges(ids) {
   const sorted = [...ids].sort((a, b) => a - b);
@@ -994,7 +1017,7 @@ el('form').addEventListener('submit', async event => {
     notify(editing ? L('已续期', 'Reservation extended') : L('已登记占用', 'NPUs reserved'));
   } catch (error) {
     el('form-error').textContent = error.message;
-    if (!editing && error.message.includes('已被登记')) {
+    if (!editing && error.status === 409) {
       await refresh();
       renderChoices();
     }

@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>NPU 资源看板</title>
   <meta name="board-api-origin" content="https://shared-npu-board-4.aptraisin1.chatgpt.site">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-fNb0ddRAsCxX8k1MW0Dtb/HTQwTgYHmzZBM6HjLbNFw='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-xQ4505cYzXaEEFROrGCZSVs9kAwcQZXftcp3NQfehP4='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
   <style>:root{color-scheme:light;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;line-height:1.5;color:#17231c;background:#f5f6f4;--surface:#fff;--ink:#17231c;--muted:#68736c;--faint:#98a29b;--rule:#e3e8e4;--soft:#f3f5f3;--green:#2f7a4d;--green-soft:#e9f3ec;--green-line:#cfe3d5;--primary:#5c9d74;--amber:#93600f;--amber-soft:#fcf1dc;--red:#bf4547;--red-soft:#fcecec;--blue:#3a64a8;--blue-soft:#e8eef8;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;--radius:18px;--shadow:0 1px 3px #1a2a200a}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -176,61 +176,62 @@ td.num{font-variant-numeric:tabular-nums}
     <section class="hero" aria-labelledby="heading">
       <div>
         <span class="eyebrow">NPU Cluster · Ascend 950DT</span>
-        <h1 id="heading">资源占用</h1>
-        <p id="hero-meta" class="hero-meta">正在加载…</p>
+        <h1 id="heading" data-en="Resource Usage">资源占用</h1>
+        <p id="hero-meta" class="hero-meta" data-en="Loading…">正在加载…</p>
       </div>
       <div class="hero-actions">
-        <button id="open-usage" type="button">使用看板</button>
-        <button id="reload" type="button">刷新</button>
-        <button id="reserve" class="primary" type="button">登记占用</button>
+        <button id="lang" type="button" lang="en" aria-label="Switch to English">EN</button>
+        <button id="open-usage" type="button" data-en="Usage">使用看板</button>
+        <button id="reload" type="button" data-en="Refresh">刷新</button>
+        <button id="reserve" class="primary" type="button" data-en="Reserve">登记占用</button>
       </div>
     </section>
 
-    <section class="strip" aria-label="提醒">
+    <section class="strip" aria-label="提醒" data-en-aria="Notices">
       <div id="sync-card" class="panel notice">
         <div class="notice-icon" aria-hidden="true">15s</div>
-        <div class="notice-body"><small>数据同步</small><strong>每 15 秒自动刷新</strong><span id="sync-text">正在连接看板服务</span></div>
-        <span id="sync-badge" class="badge">连接中</span>
+        <div class="notice-body"><small data-en="Data sync">数据同步</small><strong data-en="Auto-refresh every 15 s">每 15 秒自动刷新</strong><span id="sync-text" data-en="Connecting to the board service">正在连接看板服务</span></div>
+        <span id="sync-badge" class="badge" data-en="Connecting">连接中</span>
       </div>
       <div id="expiry-card" class="panel notice">
         <div class="notice-icon amber" aria-hidden="true">⏱</div>
-        <div class="notice-body"><small>即将到期</small><strong id="expiry-title">当前没有登记</strong><span id="expiry-text">登记到期后会自动释放</span></div>
+        <div class="notice-body"><small data-en="Expiring soon">即将到期</small><strong id="expiry-title"></strong><span id="expiry-text"></span></div>
         <span id="expiry-badge" class="badge" hidden></span>
       </div>
       <div id="mine-card" class="panel notice">
-        <div class="notice-icon" aria-hidden="true">我</div>
-        <div class="notice-body"><small>我的登记</small><strong id="mine-title">本浏览器暂无登记</strong><span id="mine-text">在本浏览器登记的占用可以续期或释放</span></div>
-        <button id="release-mine" class="pill red" type="button" hidden>释放我的</button>
+        <div class="notice-icon" aria-hidden="true" data-en="Me">我</div>
+        <div class="notice-body"><small data-en="My reservations">我的登记</small><strong id="mine-title"></strong><span id="mine-text"></span></div>
+        <button id="release-mine" class="pill red" type="button" data-en="Release mine" hidden>释放我的</button>
       </div>
     </section>
 
-    <section class="kpis" aria-label="资源概览">
-      <div class="panel kpi"><small>在线机器</small><strong id="kpi-online">—</strong><span id="kpi-online-note">—</span></div>
-      <div class="panel kpi"><small>空闲 NPU</small><strong id="kpi-free">—</strong><span id="kpi-free-note">无进程且未登记</span></div>
-      <div class="panel kpi"><small>已登记 NPU</small><strong id="kpi-reserved">—</strong><span id="kpi-reserved-note">—</span></div>
-      <div class="panel kpi"><small>有进程 NPU</small><strong id="kpi-running">—</strong><span id="kpi-running-note">—</span></div>
+    <section class="kpis" aria-label="资源概览" data-en-aria="Overview">
+      <div class="panel kpi"><small data-en="Machines online">在线机器</small><strong id="kpi-online">—</strong><span id="kpi-online-note">—</span></div>
+      <div class="panel kpi"><small data-en="Free NPUs">空闲 NPU</small><strong id="kpi-free">—</strong><span id="kpi-free-note">—</span></div>
+      <div class="panel kpi"><small data-en="Reserved NPUs">已登记 NPU</small><strong id="kpi-reserved">—</strong><span id="kpi-reserved-note">—</span></div>
+      <div class="panel kpi"><small data-en="NPUs with processes">有进程 NPU</small><strong id="kpi-running">—</strong><span id="kpi-running-note">—</span></div>
     </section>
 
     <div class="layout">
       <section class="panel section" aria-labelledby="fleet-title">
         <div class="section-head">
-          <div><span class="eyebrow">Live Resources</span><h2 id="fleet-title">资源状态</h2></div>
+          <div><span class="eyebrow">Live Resources</span><h2 id="fleet-title" data-en="Resource status">资源状态</h2></div>
           <div class="tools">
-            <label class="field">搜索资源<input id="search" type="search" placeholder="机器名或团队" autocomplete="off"></label>
-            <label class="field">机器<select id="machine-filter"><option value="">全部机器</option></select></label>
-            <label class="field">卡状态<select id="card-filter"><option value="">全部状态</option><option value="free">空闲</option><option value="reserved">已登记</option><option value="running">有进程</option><option value="unknown">数据缺失</option></select></label>
+            <label class="field"><span data-en="Search">搜索资源</span><input id="search" type="search" placeholder="机器名或团队" data-en-placeholder="Machine or team" autocomplete="off"></label>
+            <label class="field"><span data-en="Machine">机器</span><select id="machine-filter"><option value="" data-en="All machines">全部机器</option></select></label>
+            <label class="field"><span data-en="NPU status">卡状态</span><select id="card-filter"><option value="" data-en="All statuses">全部状态</option><option value="free" data-en="Free">空闲</option><option value="reserved" data-en="Reserved">已登记</option><option value="running" data-en="Has processes">有进程</option><option value="unknown" data-en="No data">数据缺失</option></select></label>
             <span id="filter-count" class="count" role="status">—</span>
           </div>
         </div>
         <div id="machines" class="machines"></div>
-        <p id="empty" class="empty" hidden>当前筛选条件下没有 NPU。</p>
+        <p id="empty" class="empty" data-en="No NPUs match the current filters." hidden>当前筛选条件下没有 NPU。</p>
       </section>
 
       <aside class="panel section activity" aria-labelledby="activity-title">
         <span class="eyebrow">Activity</span>
-        <h2 id="activity-title">使用记录</h2>
-        <label class="field"><span hidden>筛选资源</span><select id="activity-filter" aria-label="筛选使用记录"><option value="">全部资源</option></select></label>
-        <div class="act-actions"><span id="activity-count">0 条记录</span><button id="clear-activity" type="button">清空记录</button></div>
+        <h2 id="activity-title" data-en="Activity log">使用记录</h2>
+        <select id="activity-filter" aria-label="筛选使用记录" data-en-aria="Filter activity"><option value="" data-en="All resources">全部资源</option></select>
+        <div class="act-actions"><span id="activity-count"></span><button id="clear-activity" type="button" data-en="Clear">清空记录</button></div>
         <ul id="timeline" class="timeline"></ul>
       </aside>
     </div>
@@ -238,36 +239,36 @@ td.num{font-variant-numeric:tabular-nums}
 
   <dialog id="dialog" aria-labelledby="form-title">
     <form id="form">
-      <div class="dialog-head"><div><span class="eyebrow">Reserve</span><h2 id="form-title">登记占用</h2></div><button id="close" class="close" aria-label="关闭" type="button">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow">Reserve</span><h2 id="form-title"></h2></div><button id="close" class="close" aria-label="关闭" data-en-aria="Close" type="button">×</button></div>
       <div id="fields">
-        <label>机器<select id="machine"></select></label>
-        <fieldset><legend>选择 NPU</legend><div id="choices" class="choices"></div></fieldset>
+        <label><span data-en="Machine">机器</span><select id="machine"></select></label>
+        <fieldset><legend data-en="Select NPUs">选择 NPU</legend><div id="choices" class="choices"></div></fieldset>
         <div class="form-columns">
-          <label>团队名称<input id="team" required maxlength="64" placeholder="输入团队名称" autocomplete="organization"></label>
-          <label>工号<input id="employee" required maxlength="32" placeholder="输入工号" autocomplete="off" aria-describedby="employee-note"></label>
+          <label><span data-en="Team">团队名称</span><input id="team" required maxlength="64" placeholder="输入团队名称" data-en-placeholder="Team name" autocomplete="organization"></label>
+          <label><span data-en="Employee ID">工号</span><input id="employee" required maxlength="32" placeholder="输入工号" data-en-placeholder="Employee ID" autocomplete="off" aria-describedby="employee-note"></label>
         </div>
-        <p id="employee-note">工号会公开显示在看板上。</p>
+        <p id="employee-note" data-en="Your employee ID is shown publicly on the board.">工号会公开显示在看板上。</p>
       </div>
-      <label>预计结束时间<input id="ends" type="datetime-local" required></label>
+      <label><span data-en="Expected end time">预计结束时间</span><input id="ends" type="datetime-local" required></label>
       <p id="form-error" role="alert"></p>
-      <button id="submit" class="primary" type="submit">确认登记</button>
+      <button id="submit" class="primary" type="submit"></button>
     </form>
   </dialog>
 
   <dialog id="usage" class="wide" aria-labelledby="usage-title">
-    <div class="dialog-head"><div><span class="eyebrow">Usage · 近 24 小时</span><h2 id="usage-title">使用看板</h2></div><button id="close-usage" class="close" aria-label="关闭" type="button">×</button></div>
+    <div class="dialog-head"><div><span class="eyebrow">Usage · 24 h</span><h2 id="usage-title" data-en="Usage dashboard">使用看板</h2></div><button id="close-usage" class="close" aria-label="关闭" data-en-aria="Close" type="button">×</button></div>
     <div class="usage-stats">
-      <div class="kpi"><small>平均算力利用率</small><strong id="u-util">—</strong><span>在线机器全部 NPU 平均</span></div>
-      <div class="kpi"><small>平均有进程 NPU</small><strong id="u-busy">—</strong><span id="u-busy-note">—</span></div>
-      <div class="kpi"><small>峰值有进程 NPU</small><strong id="u-peak">—</strong><span id="u-peak-note">—</span></div>
-      <div class="kpi"><small>登记次数</small><strong id="u-reserves">—</strong><span id="u-reserves-note">—</span></div>
+      <div class="kpi"><small data-en="Avg. compute utilization">平均算力利用率</small><strong id="u-util">—</strong><span data-en="All NPUs on online machines">在线机器全部 NPU 平均</span></div>
+      <div class="kpi"><small data-en="Avg. NPUs with processes">平均有进程 NPU</small><strong id="u-busy">—</strong><span id="u-busy-note">—</span></div>
+      <div class="kpi"><small data-en="Peak NPUs with processes">峰值有进程 NPU</small><strong id="u-peak">—</strong><span id="u-peak-note">—</span></div>
+      <div class="kpi"><small data-en="Reservations">登记次数</small><strong id="u-reserves">—</strong><span id="u-reserves-note">—</span></div>
     </div>
-    <h3 class="sub">机器趋势</h3>
-    <div class="legend"><span><i></i>算力利用率</span><span><i class="mem"></i>HBM 占用</span></div>
+    <h3 class="sub" data-en="Machine trends">机器趋势</h3>
+    <div class="legend"><span><i></i><span data-en="Compute utilization">算力利用率</span></span><span><i class="mem"></i><span data-en="HBM usage">HBM 占用</span></span></div>
     <div id="trends" class="trends"></div>
-    <h3 class="sub">团队占用</h3>
-    <div class="table-wrap"><table><thead><tr><th>团队</th><th>当前登记卡数</th><th>机器</th><th>最近到期</th><th>24 小时登记次数</th></tr></thead><tbody id="teams"></tbody></table></div>
-    <p class="footnote">趋势和使用记录来自本浏览器打开看板期间的采样：每分钟一个采样点，保留 24 小时；使用记录最多保留 400 条。</p>
+    <h3 class="sub" data-en="Team usage">团队占用</h3>
+    <div class="table-wrap"><table><thead><tr><th data-en="Team">团队</th><th data-en="Reserved NPUs">当前登记卡数</th><th data-en="Machines">机器</th><th data-en="Next expiry">最近到期</th><th data-en="Reservations (24 h)">24 小时登记次数</th></tr></thead><tbody id="teams"></tbody></table></div>
+    <p class="footnote" data-en="Trends and activity come from samples this browser takes while the board is open: one sample per minute, kept for 24 hours; up to 400 activity entries are kept.">趋势和使用记录来自本浏览器打开看板期间的采样：每分钟一个采样点，保留 24 小时；使用记录最多保留 400 条。</p>
   </dialog>
   <div id="notice" role="status" hidden></div>
   <script>const apiOrigin = document.querySelector('meta[name=board-api-origin]')?.content || location.origin;
@@ -290,6 +291,7 @@ const activityKey = 'npu-board-activity-v1';
 const snapshotKey = 'npu-board-snapshot-v1';
 const samplesKey = 'npu-board-samples-v1';
 const mineKey = 'npu-board-mine-v1';
+const langKey = 'npu-board-lang';
 const storage = {
   get(key) { try { return localStorage.getItem(key); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, value); } catch { /* Browser can still manage this visit. */ } },
@@ -302,6 +304,31 @@ let owned = loadJson(reservationsKey, {});
 let activity = loadJson(activityKey, []);
 let samples = loadJson(samplesKey, []);
 let mine = new Set(loadJson(mineKey, []));
+let lang = storage.get(langKey) === 'en' ? 'en' : 'zh';
+const L = (zh, en) => lang === 'en' ? en : zh;
+
+function applyLanguage() {
+  document.documentElement.lang = L('zh-CN', 'en');
+  document.title = L('NPU 资源看板', 'NPU Resource Board');
+  for (const item of document.querySelectorAll('[data-en]')) {
+    item.dataset.zh ??= item.textContent;
+    item.textContent = L(item.dataset.zh, item.dataset.en);
+  }
+  for (const item of document.querySelectorAll('[data-en-placeholder]')) {
+    item.dataset.zhPlaceholder ??= item.placeholder;
+    item.placeholder = L(item.dataset.zhPlaceholder, item.dataset.enPlaceholder);
+  }
+  for (const item of document.querySelectorAll('[data-en-aria]')) {
+    item.dataset.zhAria ??= item.getAttribute('aria-label');
+    item.setAttribute('aria-label', L(item.dataset.zhAria, item.dataset.enAria));
+  }
+  const toggle = el('lang');
+  toggle.textContent = L('EN', '中文');
+  toggle.lang = L('en', 'zh-CN');
+  toggle.setAttribute('aria-label', L('Switch to English', '切换到中文'));
+  el('form-title').textContent = editing ? L('续期 · ', 'Extend · ') + editing.team : L('登记占用', 'Reserve NPUs');
+  el('submit').textContent = editing ? L('确认续期', 'Extend') : L('确认登记', 'Reserve');
+}
 
 function node(tag, content, className) {
   const item = document.createElement(tag);
@@ -354,7 +381,7 @@ async function api(path, method, body) {
   });
   if (response.status === 204) return null;
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || '操作失败，请重试');
+  if (!response.ok) throw new Error(data.error || L('操作失败，请重试', 'Request failed, please retry'));
   return data;
 }
 
@@ -370,20 +397,25 @@ function ranges(ids) {
   return parts.join(', ');
 }
 
-function cardsText(machine, reservation) {
-  return reservation.cards.length === machine.cards.length ? '整机 ' + machine.cards.length + ' 卡' : 'NPU ' + ranges(reservation.cards);
+function cardsText(cards, total) {
+  return cards.length === total ? L('整机 ' + total + ' 卡', 'whole machine (' + total + ')') : 'NPU ' + ranges(cards);
 }
 
 function who(reservation) {
-  if (reservation.employee) return reservation.team + ' · 工号 ' + reservation.employee;
-  return reservation.team + (reservation.employeeSuffix ? ' · 工号尾号 ' + reservation.employeeSuffix : '');
+  if (reservation.employee) return reservation.team + L(' · 工号 ', ' · ID ') + reservation.employee;
+  return reservation.team + (reservation.employeeSuffix ? L(' · 工号尾号 ', ' · ID ending ') + reservation.employeeSuffix : '');
+}
+
+function until(value) {
+  return L(' · 至 ', ' · until ') + time(value);
 }
 
 function remaining(ms) {
-  if (ms <= 0) return '已到期';
+  if (ms <= 0) return L('已到期', 'expired');
   const hours = Math.floor(ms / 3_600_000);
   const minutes = Math.floor(ms % 3_600_000 / 60_000);
-  return hours ? hours + ' 小时 ' + minutes + ' 分' : Math.max(1, minutes) + ' 分钟';
+  if (hours) return L(hours + ' 小时 ' + minutes + ' 分', hours + 'h ' + minutes + 'm');
+  return L(Math.max(1, minutes) + ' 分钟', Math.max(1, minutes) + ' min');
 }
 
 function observe(machine, id) {
@@ -412,38 +444,41 @@ function cardView({ id, reading, reservation, hasProcess, available, unknown }) 
   const heading = node('div', null, 'npu-head');
   const warning = reading?.health === 'warning';
   heading.append(node('b', 'NPU ' + id), node('span',
-    warning ? '异常' : reading?.temperature != null ? reading.temperature + '°C' : '—', warning ? 'warn' : ''));
-  const label = reservation?.team || (hasProcess ? '有进程 · ' + reading.processes : available ? '空闲' : unknown ? '数据缺失' : '计算活跃');
+    warning ? L('异常', 'Fault') : reading?.temperature != null ? reading.temperature + '°C' : '—', warning ? 'warn' : ''));
+  const label = reservation?.team || (hasProcess ? L('有进程 · ', 'Processes · ') + reading.processes
+    : available ? L('空闲', 'Free') : unknown ? L('数据缺失', 'No data') : L('计算活跃', 'Computing'));
   const state = node('span', label, 'npu-state');
-  card.title = reservation ? who(reservation) + ' · 至 ' + time(reservation.endsAt) : label;
+  card.title = reservation ? who(reservation) + until(reservation.endsAt) : label;
 
   const hbmPercent = reading?.hbmUsed != null && reading?.hbmTotal ? Math.round(100 * reading.hbmUsed / reading.hbmTotal) : null;
   const compute = node('div', null, 'npu-row');
-  compute.append(node('span', '算力'), node('strong', percent(reading?.utilization)));
+  compute.append(node('span', L('算力', 'Compute')), node('strong', percent(reading?.utilization)));
   const memory = node('div', null, 'npu-row');
   memory.append(node('span', 'HBM'), node('strong', hbmPercent == null ? '—'
     : (reading.hbmUsed / 1024).toFixed(1) + '/' + (reading.hbmTotal / 1024).toFixed(0) + 'G'));
-  card.append(heading, state, compute, meter('算力利用率', reading?.utilization),
-    memory, meter('HBM 占用率', hbmPercent, 'hbm'));
+  card.append(heading, state, compute, meter(L('算力利用率', 'Compute utilization'), reading?.utilization),
+    memory, meter(L('HBM 占用率', 'HBM usage'), hbmPercent, 'hbm'));
   return card;
 }
 
 function machineState(machine, observations) {
-  if (machine.status !== 'online') return { cls: 'off', text: machine.status === 'stale' ? '数据中断' : '等待接入' };
+  if (machine.status !== 'online') {
+    return { cls: 'off', text: machine.status === 'stale' ? L('数据中断', 'Data stale') : L('等待接入', 'Awaiting data') };
+  }
   const free = observations.filter(card => card.available).length;
-  if (free === observations.length) return { cls: 'free', text: '空闲' };
-  if (free === 0) return { cls: 'full', text: '满载' };
-  return { cls: 'part', text: '部分空闲' };
+  if (free === observations.length) return { cls: 'free', text: L('空闲', 'Free') };
+  if (free === 0) return { cls: 'full', text: L('满载', 'Fully used') };
+  return { cls: 'part', text: L('部分空闲', 'Partly free') };
 }
 
 async function release(reservation) {
-  if (!window.confirm('释放 ' + reservation.team + ' 的这次登记？')) return;
+  if (!window.confirm(L('释放 ' + reservation.team + ' 的这次登记？', 'Release this reservation by ' + reservation.team + '?'))) return;
   try {
     await api('/api/reservations/' + reservation.id, 'DELETE');
     claim(reservation.id);
     remember(reservation.id, 0);
     await refresh();
-    notify('已释放占用');
+    notify(L('已释放占用', 'Reservation released'));
   } catch (error) {
     notify(error.message);
   }
@@ -453,25 +488,26 @@ function machineView(machine, all, shown) {
   const section = node('article', null, 'res');
   const state = machineState(machine, all);
   const top = node('div', null, 'res-top');
-  top.append(node('span', state.text, 'state ' + state.cls), button('登记', () => showForm(machine.id)));
+  top.append(node('span', state.text, 'state ' + state.cls), button(L('登记', 'Reserve'), () => showForm(machine.id)));
   const name = node('h3', machine.name);
   name.id = 'machine-' + machine.id;
   section.setAttribute('aria-labelledby', name.id);
-  const meta = machine.model + ' · ' + machine.cards.length + ' 张卡' + (machine.receivedAt ? ' · 采样 ' + time(machine.receivedAt) : '');
+  const meta = machine.model + L(' · ' + machine.cards.length + ' 张卡', ' · ' + machine.cards.length + ' NPUs')
+    + (machine.receivedAt ? L(' · 采样 ', ' · sampled ') + time(machine.receivedAt) : '');
   const host = machine.metrics;
   const hostMetrics = node('div', null, 'host');
-  hostMetrics.append(node('span', 'CPU ' + percent(host?.cpu)), node('span', '内存 ' + percent(host?.memory)),
-    node('span', '根磁盘 ' + percent(host?.disk)));
+  hostMetrics.append(node('span', 'CPU ' + percent(host?.cpu)), node('span', L('内存 ', 'Memory ') + percent(host?.memory)),
+    node('span', L('根磁盘 ', 'Root disk ') + percent(host?.disk)));
   const cards = node('div', null, 'npus');
   cards.append(...shown.map(cardView));
 
   const groups = node('div', null, 'groups');
   for (const reservation of machine.reservations) {
     const row = node('div', null, 'group');
-    row.append(node('span', who(reservation) + ' · ' + cardsText(machine, reservation) + ' · 至 ' + time(reservation.endsAt)));
+    row.append(node('span', who(reservation) + ' · ' + cardsText(reservation.cards, machine.cards.length) + until(reservation.endsAt)));
     if (owned[reservation.id]) {
       const actions = node('span', null, 'group-actions');
-      actions.append(button('续期', () => showForm(machine.id, reservation)), button('释放', () => release(reservation)));
+      actions.append(button(L('续期', 'Extend'), () => showForm(machine.id, reservation)), button(L('释放', 'Release'), () => release(reservation)));
       row.append(actions);
     }
     groups.append(row);
@@ -480,8 +516,10 @@ function machineView(machine, all, shown) {
   const foot = node('div', null, 'res-foot');
   const free = all.filter(card => card.available).length;
   const readings = all.map(card => card.reading?.utilization).filter(value => value != null);
-  foot.append(node('span', machine.status === 'online' ? (free ? '可立即占用 ' + free + ' 张' : '暂无可立即占用的卡') : '暂无实时数据'),
-    node('span', readings.length ? '平均算力 ' + rounded(readings.reduce((a, b) => a + b, 0) / readings.length) : '—'));
+  const availability = machine.status !== 'online' ? L('暂无实时数据', 'No live data')
+    : free ? L('可立即占用 ' + free + ' 张', free + ' NPUs available now') : L('暂无可立即占用的卡', 'No NPUs available now');
+  foot.append(node('span', availability),
+    node('span', readings.length ? L('平均算力 ', 'Avg. compute ') + rounded(readings.reduce((a, b) => a + b, 0) / readings.length) : '—'));
   section.append(top, name, node('p', meta, 'res-meta'), hostMetrics, cards, groups, foot);
   return section;
 }
@@ -502,40 +540,61 @@ function diff(previous, next) {
   const events = [];
   const at = next.now;
   const before = new Map(previous.machines.map(machine => [machine.id, machine]));
-  const push = (machine, type, title, detail, extra = {}) => events.push({ t: at, machine: machine.id, type, title, detail, ...extra });
   for (const machine of next.machines) {
+    const push = (type, data = {}, extra = {}) => events.push({
+      t: at, machine: machine.id, type, ...extra, data: { name: machine.name, total: machine.cards.length, ...data },
+    });
+    const booking = (reservation, mineToo = true) => [{
+      team: reservation.team, employee: reservation.employee, employeeSuffix: reservation.employeeSuffix,
+      cards: reservation.cards, endsAt: reservation.endsAt,
+    }, { team: reservation.team, mine: mineToo && mine.has(String(reservation.id)) }];
     const prior = before.get(machine.id);
     if (!prior) continue;
-    if (prior.status !== machine.status) {
-      if (machine.status === 'online') push(machine, 'online', '机器恢复在线', machine.name);
-      else push(machine, 'offline', machine.status === 'stale' ? '机器数据中断' : '机器等待接入', machine.name);
-    }
+    if (prior.status !== machine.status) push(machine.status === 'online' ? 'online' : 'offline', { status: machine.status });
     const priorReservations = new Map(prior.reservations.map(item => [item.id, item]));
     const nextIds = new Set(machine.reservations.map(item => item.id));
     for (const reservation of machine.reservations) {
       const old = priorReservations.get(reservation.id);
-      const extra = { team: reservation.team, mine: mine.has(String(reservation.id)) };
-      if (!old) {
-        push(machine, 'reserve', '登记占用', machine.name + ' · ' + cardsText(machine, reservation) + ' · ' + who(reservation) + ' · 至 ' + time(reservation.endsAt), extra);
-      } else if (old.endsAt !== reservation.endsAt) {
-        push(machine, 'extend', '续期占用', machine.name + ' · ' + who(reservation) + ' · 至 ' + time(reservation.endsAt), extra);
-      }
+      if (!old) push('reserve', ...booking(reservation));
+      else if (old.endsAt !== reservation.endsAt) push('extend', ...booking(reservation));
     }
     for (const reservation of prior.reservations) {
       if (nextIds.has(reservation.id)) continue;
       const expired = reservation.endsAt <= at + 30_000;
-      push(machine, expired ? 'expire' : 'release', expired ? '到期释放' : '释放占用',
-        machine.name + ' · ' + cardsText(machine, reservation) + ' · ' + who(reservation),
-        { team: reservation.team, mine: !expired && mine.has(String(reservation.id)) });
+      push(expired ? 'expire' : 'release', ...booking(reservation, !expired));
     }
     if (prior.busy && machine.busy) {
       const started = machine.busy.filter(id => !prior.busy.includes(id));
       const stopped = prior.busy.filter(id => !machine.busy.includes(id));
-      if (started.length) push(machine, 'job-start', '任务启动', machine.name + ' · NPU ' + ranges(started) + ' 出现进程');
-      if (stopped.length) push(machine, 'job-stop', '任务结束', machine.name + ' · NPU ' + ranges(stopped) + ' 进程已退出');
+      if (started.length) push('job-start', { cards: started });
+      if (stopped.length) push('job-stop', { cards: stopped });
     }
   }
   return events;
+}
+
+function describe(item) {
+  const data = item.data;
+  if (!data) return { title: item.title, detail: item.detail };
+  const titles = {
+    reserve: L('登记占用', 'Reserved'),
+    extend: L('续期占用', 'Extended'),
+    release: L('释放占用', 'Released'),
+    expire: L('到期释放', 'Expired'),
+    online: L('机器恢复在线', 'Machine back online'),
+    offline: data.status === 'stale' ? L('机器数据中断', 'Machine data stale') : L('机器等待接入', 'Machine awaiting data'),
+    'job-start': L('任务启动', 'Job started'),
+    'job-stop': L('任务结束', 'Job ended'),
+  };
+  const details = {
+    reserve: () => data.name + ' · ' + cardsText(data.cards, data.total) + ' · ' + who(data) + until(data.endsAt),
+    extend: () => data.name + ' · ' + who(data) + until(data.endsAt),
+    release: () => data.name + ' · ' + cardsText(data.cards, data.total) + ' · ' + who(data),
+    'job-start': () => data.name + L(' · NPU ' + ranges(data.cards) + ' 出现进程', ' · processes started on NPU ' + ranges(data.cards)),
+    'job-stop': () => data.name + L(' · NPU ' + ranges(data.cards) + ' 进程已退出', ' · processes exited on NPU ' + ranges(data.cards)),
+  };
+  details.expire = details.release;
+  return { title: titles[item.type], detail: details[item.type]?.() ?? data.name };
 }
 
 function track(data) {
@@ -577,28 +636,32 @@ function renderActivity() {
     filter.append(...board.machines.map(machine => new Option(machine.name, machine.id)));
   }
   const items = activity.filter(item => !filter.value || item.machine === Number(filter.value));
-  el('activity-count').textContent = items.length + ' 条记录';
+  el('activity-count').textContent = L(items.length + ' 条记录', items.length + (items.length === 1 ? ' entry' : ' entries'));
   el('clear-activity').hidden = !activity.length;
   if (!items.length) {
-    el('timeline').replaceChildren(node('li', '暂无记录。看板打开期间检测到的登记、续期、释放和任务变化会出现在这里。', 'empty'));
+    el('timeline').replaceChildren(node('li', L('暂无记录。看板打开期间检测到的登记、续期、释放和任务变化会出现在这里。',
+      'No activity yet. Reservations, extensions, releases and job changes detected while the board is open will appear here.'), 'empty'));
     return;
   }
   el('timeline').replaceChildren(...items.map(item => {
+    const { title, detail } = describe(item);
     const entry = node('li', null, 'act ' + item.type);
     const head = node('div', null, 'act-head');
-    head.append(node('strong', item.title), node('span', item.mine ? '网页操作' : '自动检测', 'tag' + (item.mine ? '' : ' auto')));
+    head.append(node('strong', title), node('span', item.mine ? L('网页操作', 'From this browser') : L('自动检测', 'Detected'), 'tag' + (item.mine ? '' : ' auto')));
     const stamp = node('time', time(item.t));
     stamp.dateTime = new Date(item.t).toISOString();
-    entry.append(head, node('p', item.detail), stamp);
+    entry.append(head, node('p', detail), stamp);
     return entry;
   }));
 }
 
 function renderStrip(entries) {
-  el('sync-card').classList.add('active');
-  el('sync-badge').textContent = '正常';
-  el('sync-badge').className = 'badge green';
-  el('sync-text').textContent = '上次同步 ' + time(board.now);
+  if (board) {
+    el('sync-card').classList.add('active');
+    el('sync-badge').textContent = L('正常', 'OK');
+    el('sync-badge').className = 'badge green';
+    el('sync-text').textContent = L('上次同步 ', 'Last sync ') + time(board.now);
+  }
 
   const reservations = entries.flatMap(({ machine }) => machine.reservations.map(reservation => ({ machine, reservation })))
     .sort((a, b) => a.reservation.endsAt - b.reservation.endsAt);
@@ -608,12 +671,14 @@ function renderStrip(entries) {
   if (soonest) {
     const left = soonest.reservation.endsAt - board.now;
     el('expiry-title').textContent = soonest.machine.name + ' · ' + soonest.reservation.team;
-    el('expiry-text').textContent = cardsText(soonest.machine, soonest.reservation) + ' · ' + time(soonest.reservation.endsAt) + ' 到期 · 共 ' + reservations.length + ' 项登记';
-    el('expiry-badge').textContent = '剩 ' + remaining(left);
+    el('expiry-text').textContent = cardsText(soonest.reservation.cards, soonest.machine.cards.length) + ' · '
+      + L(time(soonest.reservation.endsAt) + ' 到期 · 共 ' + reservations.length + ' 项登记',
+        'ends ' + time(soonest.reservation.endsAt) + ' · ' + reservations.length + ' reservation(s) total');
+    el('expiry-badge').textContent = L('剩 ', '') + remaining(left) + L('', ' left');
     el('expiry-badge').className = 'badge ' + (left < 3_600_000 ? 'amber' : 'green');
   } else {
-    el('expiry-title').textContent = '当前没有登记';
-    el('expiry-text').textContent = '登记到期后会自动释放';
+    el('expiry-title').textContent = L('当前没有登记', 'No active reservations');
+    el('expiry-text').textContent = L('登记到期后会自动释放', 'Reservations are released automatically when they end');
   }
 
   const mineNow = reservations.filter(item => owned[item.reservation.id]);
@@ -621,11 +686,12 @@ function renderStrip(entries) {
   el('mine-card').classList.toggle('active', Boolean(mineNow.length));
   if (mineNow.length) {
     const cards = mineNow.reduce((total, item) => total + item.reservation.cards.length, 0);
-    el('mine-title').textContent = mineNow.length + ' 项登记 · ' + cards + ' 张卡';
-    el('mine-text').textContent = mineNow.map(item => item.machine.name).filter((name, i, all) => all.indexOf(name) === i).join('、') + ' · 最早 ' + time(mineNow[0].reservation.endsAt) + ' 到期';
+    const machines = mineNow.map(item => item.machine.name).filter((name, i, all) => all.indexOf(name) === i).join(L('、', ', '));
+    el('mine-title').textContent = L(mineNow.length + ' 项登记 · ' + cards + ' 张卡', mineNow.length + ' reservation(s) · ' + cards + ' NPUs');
+    el('mine-text').textContent = machines + L(' · 最早 ' + time(mineNow[0].reservation.endsAt) + ' 到期', ' · first ends ' + time(mineNow[0].reservation.endsAt));
   } else {
-    el('mine-title').textContent = '本浏览器暂无登记';
-    el('mine-text').textContent = '在本浏览器登记的占用可以续期或释放';
+    el('mine-title').textContent = L('本浏览器暂无登记', 'None from this browser');
+    el('mine-text').textContent = L('在本浏览器登记的占用可以续期或释放', 'Reservations made here can be extended or released');
   }
 }
 
@@ -646,14 +712,17 @@ function render() {
     if (value != null) el(id).append(node('em', '/ ' + of));
   };
   kpi('kpi-online', online, machines.length);
-  el('kpi-online-note').textContent = online === machines.length ? '全部机器在线' : (machines.length - online) + ' 台无实时数据';
+  el('kpi-online-note').textContent = online === machines.length ? L('全部机器在线', 'All machines online')
+    : L((machines.length - online) + ' 台无实时数据', (machines.length - online) + ' without live data');
   kpi('kpi-free', observed ? free : null, total);
-  el('kpi-free-note').textContent = '无进程且未登记 · ' + (observed ? Math.round(100 * free / Math.max(1, total)) + '%' : '—');
+  el('kpi-free-note').textContent = L('无进程且未登记 · ', 'Idle and unreserved · ') + (observed ? Math.round(100 * free / Math.max(1, total)) + '%' : '—');
   kpi('kpi-reserved', reserved, total);
-  el('kpi-reserved-note').textContent = teams.size ? teams.size + ' 个团队登记中' : '暂无团队登记';
+  el('kpi-reserved-note').textContent = teams.size ? L(teams.size + ' 个团队登记中', teams.size + ' team(s) reserving') : L('暂无团队登记', 'No team reservations');
   kpi('kpi-running', observed ? running : null, total);
-  el('kpi-running-note').textContent = '全集群平均算力 ' + (utilizations.length ? rounded(utilizations.reduce((a, b) => a + b, 0) / utilizations.length) : '—');
-  el('hero-meta').textContent = machines.length + ' 台机器 · ' + total + ' 张 NPU · 更新于 ' + time(board.now);
+  el('kpi-running-note').textContent = L('全集群平均算力 ', 'Cluster avg. compute ')
+    + (utilizations.length ? rounded(utilizations.reduce((a, b) => a + b, 0) / utilizations.length) : '—');
+  el('hero-meta').textContent = L(machines.length + ' 台机器 · ' + total + ' 张 NPU · 更新于 ',
+    machines.length + ' machines · ' + total + ' NPUs · updated ') + time(board.now);
   renderStrip(entries);
 
   const machineFilter = el('machine-filter');
@@ -673,7 +742,7 @@ function render() {
     .map(entry => ({ ...entry, shown: entry.cards.filter(fits) }))
     .filter(entry => entry.shown.length > 0);
   const shown = selection.reduce((sum, entry) => sum + entry.shown.length, 0);
-  el('filter-count').textContent = selection.length + ' 台 · ' + shown + ' 张';
+  el('filter-count').textContent = L(selection.length + ' 台 · ' + shown + ' 张', selection.length + ' machines · ' + shown + ' NPUs');
   el('machines').replaceChildren(...selection.map(entry => machineView(entry.machine, entry.cards, entry.shown)));
   el('empty').hidden = Boolean(selection.length);
   el('reserve').disabled = false;
@@ -720,16 +789,17 @@ function renderUsage() {
   const busyTotals = recent.map(sample => sample.m.reduce((sum, row) => sum + (row[3] || 0), 0));
   el('u-util').textContent = utilValues.length ? rounded(utilValues.reduce((a, b) => a + b, 0) / utilValues.length) : '—';
   el('u-busy').textContent = busyTotals.length ? (busyTotals.reduce((a, b) => a + b, 0) / busyTotals.length).toFixed(1) : '—';
-  el('u-busy-note').textContent = '共 ' + total + ' 张 · ' + recent.length + ' 个采样点';
+  el('u-busy-note').textContent = L('共 ' + total + ' 张 · ' + recent.length + ' 个采样点', total + ' NPUs · ' + recent.length + ' samples');
   const peak = busyTotals.length ? Math.max(...busyTotals) : null;
   el('u-peak').textContent = peak ?? '—';
   const peakAt = peak == null ? null : recent[busyTotals.indexOf(peak)].t;
-  el('u-peak-note').textContent = peakAt ? '出现在 ' + time(peakAt) : '暂无采样';
+  el('u-peak-note').textContent = peakAt ? L('出现在 ', 'at ') + time(peakAt) : L('暂无采样', 'No samples yet');
   const dayActivity = activity.filter(item => item.t > now - DAY);
   const reserves = dayActivity.filter(item => item.type === 'reserve');
+  const extensions = dayActivity.filter(item => item.type === 'extend').length;
+  const releases = dayActivity.filter(item => item.type === 'release' || item.type === 'expire').length;
   el('u-reserves').textContent = reserves.length;
-  el('u-reserves-note').textContent = '续期 ' + dayActivity.filter(item => item.type === 'extend').length + ' · 释放 '
-    + dayActivity.filter(item => item.type === 'release' || item.type === 'expire').length;
+  el('u-reserves-note').textContent = L('续期 ' + extensions + ' · 释放 ' + releases, extensions + ' extended · ' + releases + ' released');
 
   const start = recent.length ? recent[0].t : now;
   el('trends').replaceChildren(...board.machines.map(machine => {
@@ -744,8 +814,10 @@ function renderUsage() {
     head.append(node('strong', machine.name), node('span', latest ? rounded(latest.v[0]) : '—'));
     const average = index => valid.length ? rounded(valid.reduce((sum, point) => sum + (point.v[index] ?? 0), 0) / valid.length) : '—';
     const busyAverage = valid.length ? (valid.reduce((sum, point) => sum + (point.busy || 0), 0) / valid.length).toFixed(1) : '—';
-    card.append(head, valid.length > 1 ? sparkline(points, start, now) : node('div', '采样不足，保持页面打开以积累趋势', 'nodata'),
-      node('p', '平均算力 ' + average(0) + ' · 平均 HBM ' + average(1) + ' · 平均有进程 ' + busyAverage + ' 张'));
+    card.append(head, valid.length > 1 ? sparkline(points, start, now)
+      : node('div', L('采样不足，保持页面打开以积累趋势', 'Not enough samples yet; keep the page open'), 'nodata'),
+    node('p', L('平均算力 ' + average(0) + ' · 平均 HBM ' + average(1) + ' · 平均有进程 ' + busyAverage + ' 张',
+      'Avg. compute ' + average(0) + ' · avg. HBM ' + average(1) + ' · avg. ' + busyAverage + ' busy NPUs')));
     return card;
   }));
 
@@ -766,7 +838,7 @@ function renderUsage() {
   const rows = [...teams].sort((a, b) => b[1].cards - a[1].cards || b[1].count - a[1].count);
   if (!rows.length) {
     const empty = node('tr');
-    const cell = node('td', '近 24 小时没有团队登记');
+    const cell = node('td', L('近 24 小时没有团队登记', 'No team reservations in the last 24 hours'));
     cell.colSpan = 5;
     empty.append(cell);
     el('teams').replaceChildren(empty);
@@ -774,8 +846,9 @@ function renderUsage() {
   }
   el('teams').replaceChildren(...rows.map(([name, row]) => {
     const tr = node('tr');
-    tr.append(node('td', name), node('td', String(row.cards), 'num'), node('td', [...row.machines].join('、') || '—'),
-      node('td', row.next ? time(row.next) + '（剩 ' + remaining(row.next - now) + '）' : '—', 'num'), node('td', String(row.count), 'num'));
+    tr.append(node('td', name), node('td', String(row.cards), 'num'), node('td', [...row.machines].join(L('、', ', ')) || '—'),
+      node('td', row.next ? time(row.next) + L('（剩 ' + remaining(row.next - now) + '）', ' (' + remaining(row.next - now) + ' left)') : '—', 'num'),
+      node('td', String(row.count), 'num'));
     return tr;
   }));
 }
@@ -791,9 +864,9 @@ async function refresh() {
     render();
   } catch {
     el('sync-card').classList.remove('active');
-    el('sync-badge').textContent = '异常';
+    el('sync-badge').textContent = L('异常', 'Error');
     el('sync-badge').className = 'badge red';
-    el('sync-text').textContent = '更新失败，稍后自动重试';
+    el('sync-text').textContent = L('更新失败，稍后自动重试', 'Update failed; retrying shortly');
   } finally {
     refreshing = false;
   }
@@ -817,8 +890,8 @@ function choice(id, label, disabled) {
 function renderChoices() {
   const machine = board.machines.find(item => item.id === Number(el('machine').value));
   const reserved = new Set(machine.reservations.flatMap(item => item.cards));
-  const all = choice('all', '整机', reserved.size > 0);
-  const options = machine.cards.map(id => choice(id, 'NPU ' + id + (reserved.has(id) ? ' 已登记' : ''), reserved.has(id)));
+  const all = choice('all', L('整机', 'Whole machine'), reserved.size > 0);
+  const options = machine.cards.map(id => choice(id, 'NPU ' + id + (reserved.has(id) ? L(' 已登记', ' reserved') : ''), reserved.has(id)));
   const allBox = all.firstChild;
   allBox.addEventListener('change', () => {
     for (const option of options) {
@@ -839,8 +912,7 @@ function showForm(id, reservation) {
   el('team').required = !reservation;
   el('employee').required = !reservation;
   el('team').value = storage.get('npu-board-team') || '';
-  el('form-title').textContent = reservation ? '续期 · ' + reservation.team : '登记占用';
-  el('submit').textContent = reservation ? '确认续期' : '确认登记';
+  applyLanguage();
   el('machine').replaceChildren(...board.machines.map(machine => new Option(machine.name, machine.id)));
   el('machine').value = id || board.machines.find(machine => machine.reservations.flatMap(item => item.cards).length < machine.cards.length)?.id || 1;
   renderChoices();
@@ -852,6 +924,18 @@ function showForm(id, reservation) {
   dialog.showModal();
 }
 
+el('lang').addEventListener('click', () => {
+  lang = lang === 'en' ? 'zh' : 'en';
+  storage.set(langKey, lang);
+  applyLanguage();
+  if (board) render();
+  else {
+    renderStrip([]);
+    renderActivity();
+  }
+  if (dialog.open && board) renderChoices();
+  if (usageDialog.open) renderUsage();
+});
 el('reload').addEventListener('click', refresh);
 el('search').addEventListener('input', () => { if (board) render(); });
 for (const id of ['machine-filter', 'card-filter']) {
@@ -859,7 +943,7 @@ for (const id of ['machine-filter', 'card-filter']) {
 }
 el('activity-filter').addEventListener('change', renderActivity);
 el('clear-activity').addEventListener('click', () => {
-  if (!window.confirm('清空本浏览器保存的全部使用记录？')) return;
+  if (!window.confirm(L('清空本浏览器保存的全部使用记录？', 'Clear all activity saved in this browser?'))) return;
   activity = [];
   storage.set(activityKey, '[]');
   renderActivity();
@@ -868,7 +952,7 @@ el('open-usage').addEventListener('click', () => { renderUsage(); usageDialog.sh
 el('close-usage').addEventListener('click', () => usageDialog.close());
 el('release-mine').addEventListener('click', async () => {
   const targets = board.machines.flatMap(machine => machine.reservations).filter(item => owned[item.id]);
-  if (!targets.length || !window.confirm('释放本浏览器登记的 ' + targets.length + ' 项占用？')) return;
+  if (!targets.length || !window.confirm(L('释放本浏览器登记的 ' + targets.length + ' 项占用？', 'Release ' + targets.length + ' reservation(s) made in this browser?'))) return;
   const results = await Promise.allSettled(targets.map(async item => {
     await api('/api/reservations/' + item.id, 'DELETE');
     claim(item.id);
@@ -876,7 +960,8 @@ el('release-mine').addEventListener('click', async () => {
   }));
   await refresh();
   const failed = results.filter(result => result.status === 'rejected').length;
-  notify(failed ? failed + ' 项释放失败，请重试' : '已释放 ' + targets.length + ' 项占用');
+  notify(failed ? L(failed + ' 项释放失败，请重试', failed + ' release(s) failed; please retry')
+    : L('已释放 ' + targets.length + ' 项占用', 'Released ' + targets.length + ' reservation(s)'));
 });
 el('reserve').disabled = true;
 el('reserve').addEventListener('click', () => showForm());
@@ -895,7 +980,7 @@ el('form').addEventListener('submit', async event => {
     } else {
       const team = el('team').value;
       const checked = [...el('choices').querySelectorAll('input:checked')].map(box => box.value);
-      if (!checked.length) throw new Error('请选择一张或多张 NPU 卡');
+      if (!checked.length) throw new Error(L('请选择一张或多张 NPU 卡', 'Select one or more NPUs'));
       const result = await api('/api/reservations', 'POST', {
         machineId: Number(el('machine').value), team, endsAt, employee: el('employee').value,
         cards: checked.includes('all') ? 'all' : checked.map(Number),
@@ -906,7 +991,7 @@ el('form').addEventListener('submit', async event => {
     }
     dialog.close();
     await refresh();
-    notify(editing ? '已续期' : '已登记占用');
+    notify(editing ? L('已续期', 'Reservation extended') : L('已登记占用', 'NPUs reserved'));
   } catch (error) {
     el('form-error').textContent = error.message;
     if (!editing && error.message.includes('已被登记')) {
@@ -927,6 +1012,8 @@ window.addEventListener('storage', event => {
   }
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+applyLanguage();
+renderStrip([]);
 refresh();
 setInterval(refresh, 15_000);
 </script>

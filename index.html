@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>NPU 资源看板</title>
+  <meta name="board-api-origin" content="https://shared-npu-board-4.aptraisin1.chatgpt.site">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Mmo2CdIUY8avdm0J6Vm0RavdlZdWHdxDD+3rX8MRP14='; script-src 'sha256-b4d0qdl9dmu6V1JMrF5kTXHvTlDxaemqBxLZuNBb3VY='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
+  <style>:root{color-scheme:dark;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.5;color:#ecf0f8;background:#10131b;--surface:#191e2a;--inset:#141924;--rule:#303748;--muted:#a0acc3;--accent:#abbbff;--green:#65e4b2;--amber:#ffc579;--text:#ecf0f8}
+*{box-sizing:border-box}
+body{margin:0;min-width:320px}
+main{max-width:1440px;margin:auto;padding:48px 32px 64px}
+h1,h2,h3,p{margin:0}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:28px}
+h1{font-size:clamp(2.15rem,4vw,3.6rem);letter-spacing:-.055em;font-weight:750}
+.hero p{color:var(--muted);margin-top:4px}
+button{cursor:pointer;border:1px solid transparent;border-radius:9px;background:var(--accent);color:#172044;padding:10px 16px;font:inherit;font-weight:750;white-space:nowrap}
+button:hover{filter:brightness(1.12)}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px}
+.summary div{display:flex;flex-direction:column-reverse;gap:2px;background:var(--surface);border:1px solid var(--rule);border-radius:13px;padding:14px 17px}
+.summary strong{font:600 clamp(1.4rem,3vw,2.1rem)/1.15 ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.summary div:first-child strong{color:var(--green)}
+.summary span,.section-heading span{font-size:.875rem;color:var(--muted)}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+h2{font-size:1.18rem}
+.machines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.machine{min-width:0;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px}
+.machine-head,.card-title,.card-data,.group-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.machine-head h3{font-size:1.22rem}
+.machine-head .state{margin-right:auto}
+.state{color:var(--muted);border:1px solid var(--rule);padding:2px 8px;border-radius:99px;font-size:.8rem}
+.state.online{color:var(--green);border-color:#365f60}
+.state.stale,.attention{color:var(--amber)}
+.model,.host-metrics{font-size:.875rem;color:var(--muted);margin:5px 0}
+.host-metrics{margin-bottom:12px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.card{min-width:0;background:var(--inset);border:1px solid #293145;border-radius:9px;padding:8px 10px}
+.card.busy{border-color:#6577c4;background:#222941}
+.card-title strong{font:.875rem ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:750}
+.card-title span{color:var(--muted);font-size:.815rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.busy .card-title span{color:#c0cbff}
+.card-data{margin-top:3px;color:var(--muted);font-size:.81rem;font-variant-numeric:tabular-nums}
+.card-data span{white-space:nowrap}
+progress{display:block;appearance:none;height:4px;width:100%;border:0;border-radius:4px;overflow:hidden;margin:7px 0 5px;background:#30374c}
+progress::-webkit-progress-bar{background:#30374c}
+progress::-webkit-progress-value{background:var(--green)}
+progress::-moz-progress-bar{background:var(--green)}
+.group-row{border-top:1px solid var(--rule);margin-top:11px;padding-top:8px;font-size:.875rem;overflow-wrap:anywhere}
+.group-actions{display:flex;gap:5px}
+.subtle{color:var(--accent);background:#272e41;border-color:#3a4563;padding:4px 8px;font-size:.85rem}
+dialog{width:min(460px,calc(100% - 26px));padding:20px;border:1px solid var(--rule);border-radius:14px;color:var(--text);background:var(--surface);box-shadow:0 16px 60px #0008}
+dialog::backdrop{background:#090c16b5}
+.dialog-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.close{font-size:1.22rem;padding:0 9px}
+label{display:block;margin:10px 0;font-weight:650}
+input:not([type=checkbox]),select{display:block;width:100%;margin:4px 0 0;border:1px solid var(--rule);border-radius:7px;padding:8px 9px;background:var(--inset);color:var(--text);font:inherit}
+fieldset{margin:9px 0;padding:7px 9px;border:1px solid var(--rule);border-radius:8px}
+legend{font-weight:650}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.choices label{margin:0;font-size:.85rem;white-space:nowrap}
+.choices input{accent-color:var(--accent)}
+#employee-note{font-size:.82rem;color:var(--muted);margin:-5px 0 10px}
+#form-error{color:#ff9ea9;font-size:.88rem;margin:8px 0}
+#form-error:empty{display:none}
+#notice{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:9px 14px;border:1px solid var(--rule);border-radius:9px;background:#2b3763;color:#fff;max-width:90vw}
+@media(min-width:1170px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.card-data{flex-wrap:wrap;gap:1px 6px}}
+@media(max-width:850px){.machines{grid-template-columns:1fr}}
+@media(max-width:500px){main{padding:24px 12px 46px}.hero{align-items:flex-start;gap:9px}.hero p{font-size:.875rem}.hero button{padding:7px 9px;margin-top:6px}.summary{gap:6px}.summary div{padding:8px}.summary span{font-size:.74rem}.machine{padding:11px}.card{padding:7px}.card-data{flex-wrap:wrap;gap:2px 5px}}
+</style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <h1>NPU 资源看板</h1>
+        <p>昇腾 950DT 集群 · 实时负载与团队占用</p>
+      </div>
+      <button id="reserve" type="button">登记占用</button>
+    </header>
+    <section class="summary" aria-label="资源概览">
+      <div><strong id="online">—</strong><span>在线机器</span></div>
+      <div><strong id="registered">—</strong><span>已登记 NPU</span></div>
+      <div><strong id="running">—</strong><span>有进程的 NPU</span></div>
+    </section>
+    <div class="section-heading"><h2>机器状态</h2><span id="refresh" role="status">正在加载…</span></div>
+    <div id="machines" class="machines"></div>
+  </main>
+  <dialog id="dialog" aria-labelledby="form-title">
+    <form id="form">
+      <div class="dialog-heading"><h2 id="form-title">登记占用</h2><button id="close" class="subtle close" aria-label="关闭" type="button">×</button></div>
+      <div id="fields">
+        <label>机器<select id="machine"></select></label>
+        <fieldset><legend>选择 NPU</legend><div id="choices" class="choices"></div></fieldset>
+        <label>团队名称<input id="team" required maxlength="64" placeholder="输入团队名称" autocomplete="organization"></label>
+        <label>工号<input id="employee" required maxlength="32" placeholder="输入工号" autocomplete="off" aria-describedby="employee-note"></label>
+        <p id="employee-note">公开看板只显示工号末尾几位。</p>
+      </div>
+      <label>预计结束时间<input id="ends" type="datetime-local" required></label>
+      <p id="form-error" role="alert"></p>
+      <button id="submit" type="submit">确认登记</button>
+    </form>
+  </dialog>
+  <div id="notice" role="status" hidden></div>
+  <script>const apiOrigin = document.querySelector('meta[name=board-api-origin]')?.content || location.origin;
+const apiUrl = path => new URL(path, apiOrigin);
+const el = id => document.getElementById(id);
+const dialog = el('dialog');
+const dateFormat = new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const time = value => dateFormat.format(new Date(value));
+const percent = value => value == null ? '—' : value + '%';
+let board;
+let editing;
+let noticeTimer;
+let refreshing = false;
+const managementKey = 'npu-board-owner-v1';
+const reservationsKey = 'npu-board-reservations-v1';
+const storage = {
+  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+  set(key, value) { try { localStorage.setItem(key, value); } catch { /* Browser can still manage this visit. */ } },
+};
+let key = storage.get(managementKey);
+let owned;
+try { owned = JSON.parse(storage.get(reservationsKey) || '{}') || {}; } catch { owned = {}; }
+
+function node(tag, content, className) {
+  const item = document.createElement(tag);
+  if (content != null) item.textContent = content;
+  if (className) item.className = className;
+  return item;
+}
+
+function button(text, action) {
+  const item = node('button', text, 'subtle');
+  item.type = 'button';
+  item.addEventListener('click', action);
+  return item;
+}
+
+function notify(message) {
+  el('notice').textContent = message;
+  el('notice').hidden = false;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => { el('notice').hidden = true; }, 5000);
+}
+
+function browserKey() {
+  if (!key) {
+    const existing = storage.get(managementKey);
+    key = existing || Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
+    storage.set(managementKey, key);
+  }
+  return key;
+}
+
+function remember(id, expires) {
+  const current = Object.fromEntries(Object.entries(owned).filter(([, end]) => end > Date.now()));
+  if (expires) current[id] = expires;
+  else delete current[id];
+  owned = current;
+  storage.set(reservationsKey, JSON.stringify(owned));
+}
+
+async function api(path, method, body) {
+  const response = await fetch(apiUrl(path), {
+    method,
+    headers: { 'x-board-key': browserKey(), ...(body ? { 'content-type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (response.status === 204) return null;
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || '操作失败，请重试');
+  return data;
+}
+
+function cardView(machine, id) {
+  const reading = machine.metrics?.cards.find(card => card.id === id);
+  const registration = machine.reservations.find(item => item.cards.includes(id));
+  const card = node('div', null, 'card' + (registration ? ' busy' : ''));
+  const heading = node('div', null, 'card-title');
+  const team = node('span', registration?.team || '无人登记');
+  team.title = registration ? registration.team + ' · 至 ' + time(registration.endsAt) : '无人登记';
+  heading.append(node('strong', 'NPU ' + id), team);
+  const progress = document.createElement('progress');
+  progress.max = 100;
+  progress.value = reading?.utilization ?? 0;
+  progress.setAttribute('aria-label', 'NPU ' + id + ' 使用率 ' + percent(reading?.utilization));
+  const data = node('div', null, 'card-data');
+  const hbm = reading?.hbmUsed != null && reading?.hbmTotal
+    ? (reading.hbmUsed / 1024).toFixed(1) + '/' + (reading.hbmTotal / 1024).toFixed(0) + ' GiB'
+    : '—';
+  data.append(node('span', '计算 ' + percent(reading?.utilization)), node('span', 'HBM ' + hbm));
+  const detail = node('div', null, 'card-data');
+  detail.append(node('span', '进程 ' + (reading?.processes ?? '—')), node('span',
+    reading?.health === 'warning' ? '健康异常' : reading?.temperature != null ? reading.temperature + ' °C' : '—',
+    reading?.health === 'warning' ? 'attention' : ''));
+  card.append(heading, progress, data, detail);
+  return card;
+}
+
+function machineView(machine) {
+  const section = node('section', null, 'machine');
+  const heading = node('div', null, 'machine-head');
+  const name = node('h3', machine.name);
+  name.id = 'machine-' + machine.id;
+  section.setAttribute('aria-labelledby', name.id);
+  const status = { online: '在线', stale: '数据中断', pending: '等待接入' }[machine.status];
+  heading.append(name, node('span', status, 'state ' + machine.status));
+  heading.append(button('登记', () => showForm(machine.id)));
+  const model = machine.model + ' · ' + machine.cards.length + ' 张卡';
+  const last = machine.receivedAt ? ' · 采样 ' + time(machine.receivedAt) : '';
+  const host = machine.metrics;
+  const cards = node('div', null, 'cards');
+  cards.append(...machine.cards.map(id => cardView(machine, id)));
+  const groups = node('div', null, 'groups');
+  for (const reservation of machine.reservations) {
+    const row = node('div', null, 'group-row');
+    const selected = reservation.cards.length === machine.cards.length ? '整机' : 'NPU ' + reservation.cards.join(', ');
+    const identity = reservation.team + (reservation.employeeSuffix ? ' · 工号 ••••' + reservation.employeeSuffix : '');
+    row.append(node('span', identity + ' · ' + selected + ' · 至 ' + time(reservation.endsAt)));
+    if (owned[reservation.id]) {
+      const actions = node('span', null, 'group-actions');
+      actions.append(button('续期', () => showForm(machine.id, reservation)), button('释放', async () => {
+        if (!window.confirm('释放 ' + reservation.team + ' 的这次登记？')) return;
+        try {
+          await api('/api/reservations/' + reservation.id, 'DELETE');
+          remember(reservation.id, 0);
+          await refresh();
+          notify('已释放占用');
+        } catch (error) {
+          notify(error.message);
+        }
+      }));
+      row.append(actions);
+    }
+    groups.append(row);
+  }
+  section.append(heading, node('p', model + last, 'model'), node('p',
+    'CPU ' + percent(host?.cpu) + ' · 内存 ' + percent(host?.memory) + ' · 根磁盘 ' + percent(host?.disk),
+    'host-metrics'), cards, groups);
+  return section;
+}
+
+function render() {
+  const { machines } = board;
+  el('online').textContent = machines.filter(machine => machine.status === 'online').length + ' / ' + machines.length;
+  el('registered').textContent = machines.reduce((total, machine) =>
+    total + machine.reservations.reduce((sum, item) => sum + item.cards.length, 0), 0) + ' / 32';
+  const activeMachines = machines.filter(machine => machine.status === 'online' && machine.metrics?.cards.length);
+  el('running').textContent = activeMachines.length
+    ? activeMachines.reduce((total, machine) => total + machine.metrics.cards.filter(card => card.processes > 0).length, 0)
+    : '—';
+  el('machines').replaceChildren(...machines.map(machineView));
+  el('reserve').disabled = false;
+}
+
+async function refresh() {
+  if (refreshing) return;
+  refreshing = true;
+  try {
+    const response = await fetch(apiUrl('/api/board'), { cache: 'no-store' });
+    if (!response.ok) throw new Error();
+    board = await response.json();
+    render();
+    el('refresh').textContent = '更新于 ' + time(board.now);
+  } catch {
+    el('refresh').textContent = '更新失败，稍后自动重试';
+  } finally {
+    refreshing = false;
+  }
+}
+
+function localDate(value) {
+  const date = new Date(value);
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+}
+
+function choice(id, label, disabled) {
+  const box = document.createElement('input');
+  box.type = 'checkbox';
+  box.value = id;
+  box.disabled = disabled;
+  const wrapper = node('label');
+  wrapper.append(box, document.createTextNode(' ' + label));
+  return wrapper;
+}
+
+function renderChoices() {
+  const machine = board.machines.find(item => item.id === Number(el('machine').value));
+  const reserved = new Set(machine.reservations.flatMap(item => item.cards));
+  const all = choice('all', '整机', reserved.size > 0);
+  const options = machine.cards.map(id => choice(id, 'NPU ' + id + (reserved.has(id) ? ' 已登记' : ''), reserved.has(id)));
+  const allBox = all.firstChild;
+  allBox.addEventListener('change', () => {
+    for (const option of options) {
+      const box = option.firstChild;
+      box.disabled = allBox.checked || reserved.has(Number(box.value));
+      if (allBox.checked) box.checked = false;
+    }
+  });
+  el('choices').replaceChildren(all, ...options);
+}
+
+function showForm(id, reservation) {
+  if (!board) return;
+  editing = reservation;
+  el('form-error').textContent = '';
+  el('form').reset();
+  el('fields').hidden = !!reservation;
+  el('team').required = !reservation;
+  el('employee').required = !reservation;
+  el('team').value = storage.get('npu-board-team') || '';
+  el('form-title').textContent = reservation ? '续期 · ' + reservation.team : '登记占用';
+  el('submit').textContent = reservation ? '确认续期' : '确认登记';
+  el('machine').replaceChildren(...board.machines.map(machine => new Option(machine.name, machine.id)));
+  el('machine').value = id || board.machines.find(machine => machine.reservations.flatMap(item => item.cards).length < machine.cards.length)?.id || 1;
+  renderChoices();
+  const now = Date.now();
+  const minimum = Math.max(now + 120_000, (reservation?.endsAt || 0) + 60_000);
+  el('ends').min = localDate(minimum);
+  el('ends').max = localDate(now + 86_400_000);
+  el('ends').value = localDate(Math.min(now + 86_400_000, Math.max(now + 7_200_000, minimum)));
+  dialog.showModal();
+}
+
+el('reserve').disabled = true;
+el('reserve').addEventListener('click', () => showForm());
+el('close').addEventListener('click', () => dialog.close());
+el('machine').addEventListener('change', renderChoices);
+el('form').addEventListener('submit', async event => {
+  event.preventDefault();
+  el('form-error').textContent = '';
+  el('submit').disabled = true;
+  const endsAt = new Date(el('ends').value).getTime();
+  try {
+    if (editing) {
+      await api('/api/reservations/' + editing.id, 'PATCH', { endsAt });
+      remember(editing.id, endsAt);
+    } else {
+      const team = el('team').value;
+      const checked = [...el('choices').querySelectorAll('input:checked')].map(box => box.value);
+      if (!checked.length) throw new Error('请选择一张或多张 NPU 卡');
+      const result = await api('/api/reservations', 'POST', {
+        machineId: Number(el('machine').value), team, endsAt, employee: el('employee').value,
+        cards: checked.includes('all') ? 'all' : checked.map(Number),
+      });
+      remember(result.id, result.endsAt);
+      storage.set('npu-board-team', team);
+    }
+    dialog.close();
+    await refresh();
+    notify(editing ? '已续期' : '已登记占用');
+  } catch (error) {
+    el('form-error').textContent = error.message;
+    if (!editing) {
+      const previous = el('form-error').textContent;
+      if (previous.includes('已被登记')) {
+        await refresh();
+        renderChoices();
+      }
+    }
+  } finally {
+    el('submit').disabled = false;
+  }
+});
+window.addEventListener('storage', event => {
+  if (event.key === reservationsKey) {
+    try { owned = JSON.parse(event.newValue || '{}'); } catch { owned = {}; }
+    if (board) render();
+  }
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+refresh();
+setInterval(refresh, 15_000);
+</script>
+</body>
+</html>

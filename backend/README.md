@@ -22,7 +22,7 @@ python3 tests/collector_test.py
 
 采集脚本位于 `/opt/npu-board/collect.py`。用 `systemctl status npu-board-collect.timer` 检查定时器，用 `journalctl -u npu-board-collect.service` 检查上报日志。运行 `python3 /opt/npu-board/collect.py --sample` 可在本机查看一次脱敏采样。
 
-登记时需要提供工号。数据库只保留用于显示的掩码后缀，早期登记可以没有工号。
+登记时需要提供工号，看板公开显示完整工号。`0003_employee.sql` 之前的登记只保存了末四位，早期登记可以没有工号。
 
 ## 遥测中转
 

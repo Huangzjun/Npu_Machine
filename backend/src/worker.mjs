@@ -183,7 +183,7 @@ async function board(env, now) {
   await refreshRelay(env, now);
   const [snapshots, active] = await env.DB.batch([
     env.DB.prepare('SELECT machine_id, received_at, sample FROM snapshots'),
-    env.DB.prepare('SELECT id, machine_id, team, cards, ends_at, employee_suffix FROM reservations WHERE ends_at > ? ORDER BY ends_at').bind(now),
+    env.DB.prepare('SELECT id, machine_id, team, cards, ends_at, employee, employee_suffix FROM reservations WHERE ends_at > ? ORDER BY ends_at').bind(now),
   ]);
   return reply({
     now,
@@ -196,7 +196,7 @@ async function board(env, now) {
         metrics: snapshot ? JSON.parse(snapshot.sample) : null,
         reservations: active.results.filter(item => item.machine_id === machine.id).map(item => ({
           id: item.id, team: item.team, cards: JSON.parse(item.cards), endsAt: item.ends_at,
-          employeeSuffix: item.employee_suffix,
+          employee: item.employee, employeeSuffix: item.employee_suffix,
         })),
       };
     }),
@@ -237,12 +237,12 @@ async function reserve(request, env, now) {
   const [, result] = await env.DB.batch([
     env.DB.prepare('DELETE FROM reservations WHERE ends_at <= ?').bind(now),
     env.DB.prepare(`
-      INSERT INTO reservations (id, machine_id, team, cards, key_hash, ends_at, employee_suffix)
-      SELECT ?, ?, ?, ?, ?, ?, ?
+      INSERT INTO reservations (id, machine_id, team, cards, key_hash, ends_at, employee, employee_suffix)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?
       WHERE NOT EXISTS (
         SELECT 1 FROM reservations AS r, json_each(r.cards) AS existing, json_each(?) AS incoming
         WHERE r.machine_id = ? AND r.ends_at > ? AND existing.value = incoming.value
-      )`).bind(id, machine.id, team, selection, key, endsAt, employeeSuffix, selection, machine.id, now),
+      )`).bind(id, machine.id, team, selection, key, endsAt, employee, employeeSuffix, selection, machine.id, now),
   ]);
   if (!result.meta.changes) return reply({ error: '所选 NPU 已被登记，请重新选择' }, 409);
   return reply({ id, endsAt }, 201);

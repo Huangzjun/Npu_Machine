@@ -14,6 +14,7 @@ function database() {
   const connection = new DatabaseSync(':memory:');
   connection.exec(schema);
   connection.exec(readFileSync(new URL('../drizzle/0002_employee_suffix.sql', import.meta.url), 'utf8'));
+  connection.exec(readFileSync(new URL('../drizzle/0003_employee.sql', import.meta.url), 'utf8'));
   return {
     connection,
     prepare(sql) {
@@ -87,8 +88,8 @@ test('exclusive reservations support free-form team, multiple cards and whole-ma
   const json = await (await call('/api/board')).json();
   assert.equal(json.machines[0].reservations.length, 2);
   assert.equal(json.machines[1].reservations[0].cards.length, 8);
+  assert.equal(json.machines[1].reservations[0].employee, 'EMP00123');
   assert.equal(json.machines[1].reservations[0].employeeSuffix, '0123');
-  assert.doesNotMatch(JSON.stringify(json), /EMP00123/);
 });
 
 test('only the original browser can extend or release, and expired reservations free cards', async () => {

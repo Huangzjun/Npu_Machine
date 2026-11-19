@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>NPU 资源看板</title>
   <meta name="board-api-origin" content="https://shared-npu-board-4.aptraisin1.chatgpt.site">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-qFSt0kqbWDcmR2pHqbM32WyP2w/P+iCBSah0QmunUA8='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-Yp3ku9tQ9hy374WFij3iTRhsJiQx6kBWO0pKDF3MreU='; script-src 'sha256-fNb0ddRAsCxX8k1MW0Dtb/HTQwTgYHmzZBM6HjLbNFw='; connect-src https://shared-npu-board-4.aptraisin1.chatgpt.site; base-uri 'none'; form-action 'none'">
   <style>:root{color-scheme:light;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;line-height:1.5;color:#17231c;background:#f5f6f4;--surface:#fff;--ink:#17231c;--muted:#68736c;--faint:#98a29b;--rule:#e3e8e4;--soft:#f3f5f3;--green:#2f7a4d;--green-soft:#e9f3ec;--green-line:#cfe3d5;--primary:#5c9d74;--amber:#93600f;--amber-soft:#fcf1dc;--red:#bf4547;--red-soft:#fcecec;--blue:#3a64a8;--blue-soft:#e8eef8;--mono:ui-monospace,"SFMono-Regular",Menlo,monospace;--radius:18px;--shadow:0 1px 3px #1a2a200a}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -375,8 +375,8 @@ function cardsText(machine, reservation) {
 }
 
 function who(reservation) {
-  const employee = reservation.employee || reservation.employeeSuffix;
-  return reservation.team + (employee ? ' · 工号 ' + employee : '');
+  if (reservation.employee) return reservation.team + ' · 工号 ' + reservation.employee;
+  return reservation.team + (reservation.employeeSuffix ? ' · 工号尾号 ' + reservation.employeeSuffix : '');
 }
 
 function remaining(ms) {

@@ -7,8 +7,14 @@ const MACHINES = MACHINE_HOSTS.map((host, i) => ({
   model: 'Ascend 950DT',
   cards: Array.from({ length: 8 }, (_, card) => card),
 }));
-const MAX_DURATION = 24 * 60 * 60 * 1000;
+const MINUTE = 60_000;
+const DAY = 24 * 60 * MINUTE;
+const MAX_DURATION = DAY;
 const STALE_AFTER = 90_000;
+const SAMPLE_RETENTION = 7 * DAY;
+const EVENT_RETENTION = 30 * DAY;
+const USAGE_SLOT = 30 * MINUTE;
+const RESERVATION_JSON = "json_object('team', team, 'name', name, 'cards', json(cards), 'endsAt', ends_at)";
 const MACHINE_METRICS = ['cpu', 'memory', 'disk'];
 const TOKEN = /^[a-f0-9]{64}$/;
 const security = {
@@ -123,21 +129,77 @@ async function ingest(request, env, id) {
   if (!Number.isSafeInteger(sampledAt) || sampledAt < now - STALE_AFTER || sampledAt > now + 10_000) {
     throw new ValidationError('采样时间无效');
   }
-  await snapshotStatement(env, id, Math.min(now, sampledAt), snapshot).run();
+  const previous = await previousSnapshots(env);
+  await env.DB.batch([
+    ...snapshotStatements(env, id, Math.min(now, sampledAt), snapshot, previous.get(id)),
+    ...pruneStatements(env, now),
+  ]);
   return new Response(null, { status: 204 });
 }
 
-function snapshotStatement(env, id, collectedAt, snapshot) {
+async function previousSnapshots(env) {
+  const { results } = await env.DB.prepare('SELECT machine_id, received_at, sample FROM snapshots').all();
+  return new Map(results.map(row => [row.machine_id, row]));
+}
+
+const busyCards = snapshot => snapshot.cards.filter(card => card.processes > 0).map(card => card.id);
+
+// Events only land if this snapshot is newer than the stored one, so concurrent or replayed uploads cannot log twice.
+function snapshotEvent(env, id, collectedAt, at, type, data) {
   return env.DB.prepare(
-    'INSERT INTO snapshots (machine_id, received_at, sample) VALUES (?, ?, ?) ' +
-    'ON CONFLICT(machine_id) DO UPDATE SET received_at=excluded.received_at, sample=excluded.sample ' +
-    'WHERE excluded.received_at > snapshots.received_at'
-  ).bind(id, collectedAt, JSON.stringify(snapshot));
+    'INSERT INTO events (at, machine_id, type, data) SELECT ?, ?, ?, ? ' +
+    'WHERE NOT EXISTS (SELECT 1 FROM snapshots WHERE machine_id = ? AND received_at >= ?)'
+  ).bind(at, id, type, JSON.stringify(data), id, collectedAt);
+}
+
+function snapshotStatements(env, id, collectedAt, snapshot, previous) {
+  const statements = [];
+  if (previous && collectedAt > previous.received_at) {
+    if (collectedAt - previous.received_at >= STALE_AFTER) {
+      statements.push(
+        snapshotEvent(env, id, collectedAt, previous.received_at + STALE_AFTER, 'offline', {}),
+        snapshotEvent(env, id, collectedAt, collectedAt, 'online', {}),
+      );
+    }
+    const before = busyCards(JSON.parse(previous.sample));
+    const after = busyCards(snapshot);
+    const started = after.filter(card => !before.includes(card));
+    const stopped = before.filter(card => !after.includes(card));
+    if (started.length) statements.push(snapshotEvent(env, id, collectedAt, collectedAt, 'job-start', { cards: started }));
+    if (stopped.length) statements.push(snapshotEvent(env, id, collectedAt, collectedAt, 'job-stop', { cards: stopped }));
+  }
+  const utilization = snapshot.cards.map(card => card.utilization).filter(value => value != null);
+  const memory = snapshot.cards.filter(card => card.hbmUsed != null && card.hbmTotal);
+  const capacity = memory.reduce((total, card) => total + card.hbmTotal, 0);
+  statements.push(
+    env.DB.prepare(
+      'INSERT INTO samples (at, machine_id, utilization, hbm, busy) VALUES (?, ?, ?, ?, ?) ' +
+      'ON CONFLICT(at, machine_id) DO UPDATE SET utilization=excluded.utilization, hbm=excluded.hbm, busy=excluded.busy'
+    ).bind(
+      Math.floor(collectedAt / MINUTE) * MINUTE, id,
+      utilization.length ? Math.round(utilization.reduce((a, b) => a + b, 0) / utilization.length) : null,
+      capacity ? Math.round(100 * memory.reduce((total, card) => total + card.hbmUsed, 0) / capacity) : null,
+      snapshot.cards.length ? busyCards(snapshot).length : null,
+    ),
+    env.DB.prepare(
+      'INSERT INTO snapshots (machine_id, received_at, sample) VALUES (?, ?, ?) ' +
+      'ON CONFLICT(machine_id) DO UPDATE SET received_at=excluded.received_at, sample=excluded.sample ' +
+      'WHERE excluded.received_at > snapshots.received_at'
+    ).bind(id, collectedAt, JSON.stringify(snapshot)),
+  );
+  return statements;
+}
+
+function pruneStatements(env, now) {
+  return [
+    env.DB.prepare('DELETE FROM samples WHERE at < ?').bind(now - SAMPLE_RETENTION),
+    env.DB.prepare('DELETE FROM events WHERE at < ?').bind(now - EVENT_RETENTION),
+  ];
 }
 
 const bytesFromHex = hex => Uint8Array.from(hex.match(/../g), byte => Number.parseInt(byte, 16));
 
-async function verifyReading(env, record, now) {
+async function verifyReading(env, record, now, previous) {
   if (!record || typeof record !== 'object') return null;
   const { machine: id, timestamp, sample, signature } = record;
   const machine = MACHINES.find(item => item.id === id);
@@ -149,7 +211,7 @@ async function verifyReading(env, record, now) {
   const message = new TextEncoder().encode(timestamp + '\n' + sample);
   if (!await crypto.subtle.verify('HMAC', key, bytesFromHex(signature), message)) return null;
   try {
-    return snapshotStatement(env, id, timestamp, sanitizedSnapshot(JSON.parse(sample), machine));
+    return snapshotStatements(env, id, timestamp, sanitizedSnapshot(JSON.parse(sample), machine), previous.get(id));
   } catch {
     return null;
   }
@@ -170,8 +232,9 @@ async function refreshRelay(env, now) {
     }
     const { records } = await readBody(response, 85_000);
     if (!Array.isArray(records) || records.length > MACHINES.length) return;
-    const readings = (await Promise.all(records.map(record => verifyReading(env, record, now)))).filter(Boolean);
-    if (readings.length) await env.DB.batch(readings);
+    const previous = await previousSnapshots(env);
+    const readings = (await Promise.all(records.map(record => verifyReading(env, record, now, previous)))).filter(Boolean);
+    if (readings.length) await env.DB.batch([...readings.flat(), ...pruneStatements(env, now)]);
   } catch (error) {
     const message = String(error.message || '').replaceAll(env.COLLECTOR_RELAY_URL, '[relay]').slice(0, 160);
     console.warn('Telemetry relay unavailable', error.name, message);
@@ -180,11 +243,21 @@ async function refreshRelay(env, now) {
   }
 }
 
+function expireStatements(env, now) {
+  return [
+    env.DB.prepare(
+      `INSERT INTO events (at, machine_id, type, data) SELECT ends_at, machine_id, 'expire', ${RESERVATION_JSON} FROM reservations WHERE ends_at <= ?`
+    ).bind(now),
+    env.DB.prepare('DELETE FROM reservations WHERE ends_at <= ?').bind(now),
+  ];
+}
+
 async function board(env, now) {
   await refreshRelay(env, now);
-  const [snapshots, active] = await env.DB.batch([
+  const [, , snapshots, active] = await env.DB.batch([
+    ...expireStatements(env, now),
     env.DB.prepare('SELECT machine_id, received_at, sample FROM snapshots'),
-    env.DB.prepare('SELECT id, machine_id, team, cards, ends_at, employee, employee_suffix FROM reservations WHERE ends_at > ? ORDER BY ends_at').bind(now),
+    env.DB.prepare('SELECT id, machine_id, team, cards, ends_at, name FROM reservations WHERE ends_at > ? ORDER BY ends_at').bind(now),
   ]);
   return reply({
     now,
@@ -197,10 +270,62 @@ async function board(env, now) {
         metrics: snapshot ? JSON.parse(snapshot.sample) : null,
         reservations: active.results.filter(item => item.machine_id === machine.id).map(item => ({
           id: item.id, team: item.team, cards: JSON.parse(item.cards), endsAt: item.ends_at,
-          employee: item.employee, employeeSuffix: item.employee_suffix,
+          name: item.name,
         })),
       };
     }),
+  });
+}
+
+async function activity(env, now) {
+  const [, , events] = await env.DB.batch([
+    ...expireStatements(env, now),
+    env.DB.prepare('SELECT id, at, machine_id, type, data FROM events ORDER BY at DESC, id DESC LIMIT 200'),
+  ]);
+  return reply({
+    now,
+    events: events.results.map(row => ({ id: row.id, at: row.at, machine: row.machine_id, type: row.type, data: JSON.parse(row.data) })),
+  });
+}
+
+// The page passes its local midnight so slots line up with the viewer's day.
+async function usage(env, now, params) {
+  const from = Number(params.get('from'));
+  const to = Number(params.get('to'));
+  if (!Number.isSafeInteger(from) || !Number.isSafeInteger(to) || to <= from || to - from > DAY + 60 * MINUTE ||
+      from < now - SAMPLE_RETENTION - DAY || from > now) {
+    throw new ValidationError('统计时间范围无效');
+  }
+  const [cells, summary, peak, counts] = await env.DB.batch([
+    env.DB.prepare(
+      'SELECT CAST((at - ?) / ? AS INTEGER) AS slot, machine_id, ROUND(AVG(utilization)) AS utilization, ' +
+      'ROUND(AVG(hbm)) AS hbm, ROUND(AVG(busy), 1) AS busy FROM samples WHERE at >= ? AND at < ? ' +
+      'GROUP BY slot, machine_id ORDER BY slot, machine_id'
+    ).bind(from, USAGE_SLOT, from, to),
+    env.DB.prepare(
+      'SELECT AVG(utilization) AS utilization, COUNT(DISTINCT at) AS minutes, ' +
+      '(SELECT AVG(total) FROM (SELECT SUM(busy) AS total FROM samples WHERE at >= ? AND at < ? GROUP BY at)) AS busy ' +
+      'FROM samples WHERE at >= ? AND at < ?'
+    ).bind(from, to, from, to),
+    env.DB.prepare(
+      'SELECT at, SUM(busy) AS busy FROM samples WHERE at >= ? AND at < ? GROUP BY at ORDER BY busy DESC, at DESC LIMIT 1'
+    ).bind(from, to),
+    env.DB.prepare(
+      "SELECT type, json_extract(data, '$.team') AS team, COUNT(*) AS count FROM events " +
+      "WHERE at >= ? AND at < ? AND type IN ('reserve', 'extend', 'release', 'expire') GROUP BY type, team"
+    ).bind(from, to),
+  ]);
+  const totals = summary.results[0] ?? {};
+  return reply({
+    from, to, slot: USAGE_SLOT,
+    cells: cells.results.map(row => [row.slot, row.machine_id, row.utilization, row.hbm, row.busy]),
+    summary: {
+      utilization: totals.utilization == null ? null : Math.round(totals.utilization),
+      busy: totals.busy == null ? null : Math.round(totals.busy * 10) / 10,
+      minutes: totals.minutes ?? 0,
+      peak: peak.results[0] ? { at: peak.results[0].at, busy: peak.results[0].busy } : null,
+    },
+    counts: counts.results,
   });
 }
 
@@ -221,11 +346,11 @@ async function reserve(request, env, now) {
   if (!team || [...team].length > 32 || !/^[\p{L}\p{N}][\p{L}\p{N}\p{M} _().·&+—-]*$/u.test(team)) {
     throw new ValidationError('请输入有效的团队名称（1 至 32 字）');
   }
-  const employee = typeof input.employee === 'string' ? input.employee.normalize('NFKC').trim() : '';
-  if (!/^[a-z0-9][a-z0-9._-]{1,31}$/i.test(employee)) {
-    throw new ValidationError('请输入有效工号（2 至 32 位字母、数字或 . _ -）');
+  const submitted = input.name ?? input.employee;
+  const name = typeof submitted === 'string' ? submitted.normalize('NFKC').trim().replace(/[ ]+/g, ' ') : '';
+  if (!name || [...name].length > 32 || !/^[\p{L}\p{N}][\p{L}\p{N}\p{M} ·.'_-]*$/u.test(name)) {
+    throw new ValidationError('请输入有效的姓名（1 至 32 字）');
   }
-  const employeeSuffix = employee.slice(-Math.min(4, employee.length - 1));
   const cards = input.cards === 'all' ? machine.cards : input.cards;
   if (!Array.isArray(cards) || !cards.length || cards.length > machine.cards.length ||
       new Set(cards).size !== cards.length || cards.some(card => !machine.cards.includes(card))) {
@@ -235,15 +360,18 @@ async function reserve(request, env, now) {
   const endsAt = expiry(input.endsAt, now);
   const selection = JSON.stringify([...cards].sort((a, b) => a - b));
   // The overlap check and insert execute as one SQLite statement, including under concurrent requests.
-  const [, result] = await env.DB.batch([
-    env.DB.prepare('DELETE FROM reservations WHERE ends_at <= ?').bind(now),
+  const [, , result] = await env.DB.batch([
+    ...expireStatements(env, now),
     env.DB.prepare(`
-      INSERT INTO reservations (id, machine_id, team, cards, key_hash, ends_at, employee, employee_suffix)
-      SELECT ?, ?, ?, ?, ?, ?, ?, ?
+      INSERT INTO reservations (id, machine_id, team, cards, key_hash, ends_at, name)
+      SELECT ?, ?, ?, ?, ?, ?, ?
       WHERE NOT EXISTS (
         SELECT 1 FROM reservations AS r, json_each(r.cards) AS existing, json_each(?) AS incoming
         WHERE r.machine_id = ? AND r.ends_at > ? AND existing.value = incoming.value
-      )`).bind(id, machine.id, team, selection, key, endsAt, employee, employeeSuffix, selection, machine.id, now),
+      )`).bind(id, machine.id, team, selection, key, endsAt, name, selection, machine.id, now),
+    env.DB.prepare(
+      `INSERT INTO events (at, machine_id, type, data) SELECT ?, machine_id, 'reserve', ${RESERVATION_JSON} FROM reservations WHERE id = ?`
+    ).bind(now, id),
   ]);
   if (!result.meta.changes) return reply({ error: '所选 NPU 已被登记，请重新选择' }, 409);
   return reply({ id, endsAt }, 201);
@@ -254,20 +382,31 @@ async function manage(request, env, now, id) {
   if (!key) return reply({ error: '无法管理该登记' }, 403);
   let result;
   if (request.method === 'DELETE') {
-    result = await env.DB.prepare('DELETE FROM reservations WHERE id = ? AND key_hash = ? AND ends_at > ?')
-      .bind(id, key, now).run();
+    [, result] = await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO events (at, machine_id, type, data) SELECT ?, machine_id, 'release', ${RESERVATION_JSON} ` +
+        'FROM reservations WHERE id = ? AND key_hash = ? AND ends_at > ?'
+      ).bind(now, id, key, now),
+      env.DB.prepare('DELETE FROM reservations WHERE id = ? AND key_hash = ? AND ends_at > ?').bind(id, key, now),
+    ]);
   } else {
     const input = await readBody(request, 1024);
     const endsAt = expiry(input.endsAt, now);
-    result = await env.DB.prepare(
-      'UPDATE reservations SET ends_at = ? WHERE id = ? AND key_hash = ? AND ends_at > ? AND ends_at < ?'
-    ).bind(endsAt, id, key, now, endsAt).run();
+    [result] = await env.DB.batch([
+      env.DB.prepare(
+        'UPDATE reservations SET ends_at = ? WHERE id = ? AND key_hash = ? AND ends_at > ? AND ends_at < ?'
+      ).bind(endsAt, id, key, now, endsAt),
+      env.DB.prepare(
+        `INSERT INTO events (at, machine_id, type, data) SELECT ?, machine_id, 'extend', ${RESERVATION_JSON} ` +
+        'FROM reservations WHERE id = ? AND key_hash = ? AND ends_at = ? AND changes() > 0'
+      ).bind(now, id, key, endsAt),
+    ]);
   }
   if (!result.meta.changes) return reply({ error: '无法更新该登记，续期需晚于原结束时间' }, 409);
   return new Response(null, { status: 204 });
 }
 
-const crossOriginPaths = /^\/api\/(?:board|reservations(?:\/[0-9a-f-]{36})?)$/;
+const crossOriginPaths = /^\/api\/(?:board|activity|usage|reservations(?:\/[0-9a-f-]{36})?)$/;
 
 function pagesCors(request, response) {
   const headers = new Headers(response.headers);
@@ -303,6 +442,8 @@ async function handleRequest(request, env, pagesRequest) {
     if (method === 'GET' || method === 'HEAD') {
       if (pathname === '/') return page(method === 'HEAD' ? null : PAGE);
       if (pathname === '/api/board' && method === 'GET') return await board(env, now);
+      if (pathname === '/api/activity' && method === 'GET') return await activity(env, now);
+      if (pathname === '/api/usage' && method === 'GET') return await usage(env, now, url.searchParams);
     }
     const source = pathname.match(/^\/api\/ingest\/([1-4])$/);
     if (source && method === 'POST') return await ingest(request, env, Number(source[1]));

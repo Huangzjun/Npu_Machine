@@ -16,13 +16,15 @@ python3 tests/collector_test.py
 
 `dist/server/index.js` 是 Sites 的 Worker 入口。数据库绑定为 `DB`，SQL 迁移在 `drizzle/` 下。每台机器在 Sites 的环境变量中使用独立的 `COLLECTOR_TOKEN_1` 至 `COLLECTOR_TOKEN_4`。公开接口 `GET /api/board` 只返回机器 IP、指标和团队登记，机器编号 1 至 4 依次对应 `worker.mjs` 中 `MACHINE_HOSTS` 的四个 IP。
 
+使用记录和使用统计保存在服务端，所有访问者看到的一致。`GET /api/activity` 返回最近 200 条记录：登记、续期、释放由对应请求写入，到期释放在清理过期登记时补记，任务启停和机器中断、恢复在机器上报时与上一份快照对比得出。每次上报还按分钟写入一条利用率采样，`GET /api/usage?from=<毫秒>&to=<毫秒>` 按 30 分钟时段汇总某一天（页面传入本地零点）的采样和登记次数。采样保留 7 天，记录保留 30 天。
+
 ## 服务器采集
 
 采集脚本只读取主机指标和昇腾设备指标。每台机器的 `/etc/npu-board/collector.env` 中设置 `NPU_BOARD_ENDPOINT` 和 `NPU_BOARD_TOKEN`。上报地址以 `/api/ingest/1` 到 `/api/ingest/4` 结尾。主机配置目录和凭据文件分别使用 0700 和 0600 权限。
 
 采集脚本位于 `/opt/npu-board/collect.py`。用 `systemctl status npu-board-collect.timer` 检查定时器，用 `journalctl -u npu-board-collect.service` 检查上报日志。运行 `python3 /opt/npu-board/collect.py --sample` 可在本机查看一次脱敏采样。
 
-登记时需要提供工号，看板公开显示完整工号。`0003_employee.sql` 之前的登记只保存了末四位，早期登记可以没有工号。
+登记时填写姓名，看板公开显示。为兼容旧页面，接口在缺少 `name` 时把 `employee` 字段当作姓名。早期登记存过的工号列仍在数据库中，但不再返回或显示。
 
 ## 遥测中转
 

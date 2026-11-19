@@ -14,7 +14,9 @@ function database() {
   const connection = new DatabaseSync(':memory:');
   connection.exec(schema);
   connection.exec(readFileSync(new URL('../drizzle/0002_employee_suffix.sql', import.meta.url), 'utf8'));
-  connection.exec(readFileSync(new URL('../drizzle/0003_employee.sql', import.meta.url), 'utf8'));
+  for (const migration of ['0003_employee', '0004_activity', '0005_name']) {
+    connection.exec(readFileSync(new URL('../drizzle/' + migration + '.sql', import.meta.url), 'utf8'));
+  }
   return {
     connection,
     prepare(sql) {
@@ -26,6 +28,7 @@ function database() {
             return { meta: statement.run(...parameters) };
           },
           async run() { return this.execute(); },
+          async all() { return this.execute(); },
         };
       }
       return { ...bound([]), bind: (...parameters) => bound(parameters) };
@@ -53,7 +56,7 @@ function app(extra = {}) {
     }), { DB: db, COLLECTOR_TOKEN_1: collector, ...extra });
   }
   const reserve = (team, cards, key = owner, machineId = 1) => call('/api/reservations', 'POST',
-    { machineId, team, cards, employee: 'EMP00123', endsAt: Date.now() + 3_600_000 }, { 'x-board-key': key });
+    { machineId, team, cards, name: '张 三', endsAt: Date.now() + 3_600_000 }, { 'x-board-key': key });
   return { db, call, reserve };
 }
 
@@ -88,8 +91,10 @@ test('exclusive reservations support free-form team, multiple cards and whole-ma
   const json = await (await call('/api/board')).json();
   assert.equal(json.machines[0].reservations.length, 2);
   assert.equal(json.machines[1].reservations[0].cards.length, 8);
-  assert.equal(json.machines[1].reservations[0].employee, 'EMP00123');
-  assert.equal(json.machines[1].reservations[0].employeeSuffix, '0123');
+  assert.equal(json.machines[1].reservations[0].name, '张 三');
+  assert.equal('employee' in json.machines[1].reservations[0], false);
+  assert.equal((await call('/api/reservations', 'POST',
+    { machineId: 3, team: 'X', cards: [0], name: '<b>', endsAt: Date.now() + 3_600_000 }, { 'x-board-key': owner })).status, 400);
 });
 
 test('only the original browser can extend or release, and expired reservations free cards', async () => {
@@ -144,10 +149,61 @@ test('GitHub Pages can use board and reservation APIs without exposing ingest cr
   assert.equal(preflight.status, 204);
   assert.equal(preflight.headers.get('access-control-allow-origin'), origin);
   const result = await call('/api/reservations', 'POST', {
-    machineId: 1, team: 'Pages 测试', employee: 'test003', cards: [0], endsAt: Date.now() + 120_000,
+    machineId: 1, team: 'Pages 测试', name: 'test003', cards: [0], endsAt: Date.now() + 120_000,
   }, { origin, 'x-board-key': owner });
   assert.equal(result.status, 201);
   assert.equal(result.headers.get('access-control-allow-origin'), origin);
   assert.equal((await call('/api/ingest/1', 'OPTIONS', null, { origin })).headers.get('access-control-allow-origin'), null);
   assert.equal((await call('/api/reservations', 'POST', {}, { origin: 'https://other.github.io' })).status, 403);
+  assert.equal((await call('/api/activity', 'GET', null, { origin })).headers.get('access-control-allow-origin'), origin);
+});
+
+test('the shared activity log records reservations, extensions, releases and expiries', async () => {
+  const { call, reserve, db } = app();
+  const { id } = await (await reserve('A 团队', [2])).json();
+  const path = '/api/reservations/' + id;
+  assert.equal((await call(path, 'PATCH', { endsAt: Date.now() + 7_200_000 }, { 'x-board-key': owner })).status, 204);
+  assert.equal((await call(path, 'PATCH', { endsAt: Date.now() + 3_000_000 }, { 'x-board-key': owner })).status, 409);
+  assert.equal((await call(path, 'DELETE', null, { 'x-board-key': outsider })).status, 409);
+  assert.equal((await call(path, 'DELETE', null, { 'x-board-key': owner })).status, 204);
+  const second = await (await reserve('B 团队', [3])).json();
+  db.connection.prepare('UPDATE reservations SET ends_at = ? WHERE id = ?').run(Date.now() - 1000, second.id);
+  assert.equal((await reserve('C 团队', [2], outsider)).status, 201);
+
+  const response = await call('/api/activity');
+  const text = await response.text();
+  assert.doesNotMatch(text, /key_hash|employee/);
+  const { events } = JSON.parse(text);
+  assert.deepEqual(events.map(event => event.type).sort(), ['expire', 'extend', 'release', 'reserve', 'reserve', 'reserve']);
+  const release = events.find(event => event.type === 'release');
+  assert.deepEqual({ machine: release.machine, team: release.data.team, name: release.data.name, cards: release.data.cards },
+    { machine: 1, team: 'A 团队', name: '张 三', cards: [2] });
+  assert.equal(events.find(event => event.type === 'expire').data.team, 'B 团队');
+});
+
+test('ingest logs job and connectivity changes and usage reports half-hour slots of the day', async () => {
+  const { call, db } = app();
+  const now = Date.now();
+  const card = processes => ({ id: 0, utilization: processes ? 80 : 0, hbmUsed: 50, hbmTotal: 100, processes });
+  db.connection.prepare('INSERT INTO snapshots VALUES (1, ?, ?)').run(now - 200_000, JSON.stringify({ cards: [card(0)] }));
+  const upload = (processes, sampledAt) => call('/api/ingest/1', 'POST', { cards: [card(processes)], sampledAt },
+    { authorization: 'Bearer ' + collector });
+  assert.equal((await upload(1, now - 1000)).status, 204);
+  assert.equal((await upload(1, now - 2000)).status, 204);
+  assert.equal((await upload(0, now)).status, 204);
+  const { events } = await (await call('/api/activity')).json();
+  assert.deepEqual(events.map(event => event.type).sort(), ['job-start', 'job-stop', 'offline', 'online']);
+  assert.deepEqual(events.find(event => event.type === 'job-start').data.cards, [0]);
+
+  const from = now - 3_600_000;
+  const report = await (await call('/api/usage?from=' + from + '&to=' + (from + 86_400_000))).json();
+  assert.equal(report.slot, 1_800_000);
+  assert.equal(report.cells.length, 1);
+  const [slot, machine, utilization, hbm] = report.cells[0];
+  assert.equal(machine, 1);
+  assert.equal(slot, Math.floor((Math.floor(now / 60_000) * 60_000 - from) / 1_800_000));
+  assert.equal(hbm, 50);
+  assert.ok(utilization === 0 || utilization === 80);
+  assert.equal(report.summary.minutes >= 1, true);
+  assert.equal((await call('/api/usage?from=' + from + '&to=' + (from + 3 * 86_400_000))).status, 400);
 });

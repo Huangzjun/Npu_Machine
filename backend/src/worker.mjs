@@ -1,8 +1,9 @@
 import { PAGE } from './assets.mjs';
 
-const MACHINES = Array.from({ length: 4 }, (_, i) => ({
+const MACHINE_HOSTS = ['195.121.29.13', '195.121.32.16', '195.121.1.17', '195.121.3.19'];
+const MACHINES = MACHINE_HOSTS.map((host, i) => ({
   id: i + 1,
-  name: '机器 ' + String(i + 1).padStart(2, '0'),
+  name: host,
   model: 'Ascend 950DT',
   cards: Array.from({ length: 8 }, (_, card) => card),
 }));
